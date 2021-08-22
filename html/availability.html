@@ -7,24 +7,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0 shrink-to-fit=no">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/css/datepicker-bs4.min.css">
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/notie/dist/notie.min.css">
+  <link rel="stylesheet" type="text/css" href="static/styles/main.css">
   <title>Book</title>
-
-  <style>
-    .room-image {
-      max-width: 50%;
-    }
-
-    footer {
-      background-color: #163b65;
-      margin-top: 25px;
-      height: 100px;
-      padding: 25px;
-    }
-
-    footer p {
-      color: white;
-    }
-  </style>
 </head>
 
 <body>
@@ -66,22 +52,18 @@
       <div class="col-md-3"></div>
       <div class="col-md-6">
         <h1 class="mt-5">Search for availablility</h1>
-        <form action="/book" method="GET">
-          <div class="row">
+        <form action="" method="GET" class="needs-validation" novalidate>
+          <div class="row" id="reservation-dates">
             <div class="col">
               <div class="mb-3">
-                <label for="start-date" class="form-label">Starting Date</label>
-                <input required type="date" class="form-control" id="start-date" name="start-date"
-                  aria-describedby="startDateHelp">
-                <div id="startDateHelp" class="form-text">Enter your starting date</div>
+                <input required type="text" class="form-control" id="start-date" name="start-date" autocomplete="off"
+                  placeholder="Arrival">
               </div>
             </div>
             <div class="col">
               <div class="mb-3">
-                <label for="end-date" class="form-label">Ending Date</label>
-                <input required type="date" class="form-control" id="end-date" name="end-date"
-                  aria-describedby="startDateHelp">
-                <div id="endDateHelp" class="form-text">Enter your ending date</div>
+                <input required type="text" class="form-control" id="end-date" name="end-date" autocomplete="off"
+                  placeholder="Departure">
               </div>
             </div>
           </div>
@@ -109,6 +91,10 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"
     integrity="sha384-cn7l7gDp0eyniUwwAZgrzD06kc/tftFf19TOAs2zVinnD/C7E91j9yyk5//jjpt/"
     crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/js/datepicker-full.min.js"></script>
+  <script src="https://unpkg.com/notie"></script>
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="static/scripts/availability.js" type="module"></script>
 </body>
 
 </html>

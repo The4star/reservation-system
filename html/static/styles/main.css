@@ -1,0 +1,18 @@
+.room-image {
+  max-width: 50%;
+}
+
+.datepicker {
+  z-index: 10000;
+}
+
+footer {
+  background-color: #163b65;
+  margin-top: 25px;
+  height: 100px;
+  padding: 25px;
+}
+
+footer p {
+  color: white;
+}
