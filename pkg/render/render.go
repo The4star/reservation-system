@@ -60,6 +60,13 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 		return myCache, err
 	}
 
+	childPages, err := filepath.Glob("./templates/*/*.page.tmpl")
+	if err != nil {
+		return myCache, err
+	}
+
+	pages = append(pages, childPages...)
+
 	for _, page := range pages {
 		name := filepath.Base(page)
 		ts, err := template.New(name).Funcs(functions).ParseFiles(page)

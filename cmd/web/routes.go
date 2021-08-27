@@ -15,8 +15,16 @@ func routes(app *config.AppConfig) http.Handler {
 	router.Use(middleware.Recoverer)
 	router.Use(NoSurf)
 	router.Use(SessionLoad)
+
+	//routes
 	router.Get("/", handlers.Repo.Home)
 	router.Get("/about", handlers.Repo.About)
+	router.Get("/rooms/standard-suite", handlers.Repo.StandardSuite)
+	router.Get("/rooms/deluxe-suite", handlers.Repo.DeluxeSuite)
+	router.Get("/availability", handlers.Repo.Availability)
+	router.Get("/book", handlers.Repo.Book)
+	router.Get("/contact", handlers.Repo.Contact)
+
 	fileServer := http.FileServer(http.Dir("./static/"))
 	router.Handle("/static/*", http.StripPrefix("/static", fileServer))
 	return router
