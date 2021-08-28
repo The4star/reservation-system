@@ -9,8 +9,8 @@ import (
 	"text/template"
 
 	"github.com/justinas/nosurf"
-	"github.com/the4star/reservation-system/pkg/config"
-	"github.com/the4star/reservation-system/pkg/models"
+	"github.com/the4star/reservation-system/internal/config"
+	"github.com/the4star/reservation-system/internal/models"
 )
 
 var functions = template.FuncMap{}

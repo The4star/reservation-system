@@ -7,9 +7,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/the4star/reservation-system/pkg/config"
-	"github.com/the4star/reservation-system/pkg/models"
-	"github.com/the4star/reservation-system/pkg/render"
+	"github.com/the4star/reservation-system/internal/config"
+	"github.com/the4star/reservation-system/internal/models"
+	"github.com/the4star/reservation-system/internal/render"
 )
 
 // the repository used by the handlers

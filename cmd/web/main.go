@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/the4star/reservation-system/pkg/config"
-	"github.com/the4star/reservation-system/pkg/handlers"
-	"github.com/the4star/reservation-system/pkg/render"
+	"github.com/the4star/reservation-system/internal/config"
+	"github.com/the4star/reservation-system/internal/handlers"
+	"github.com/the4star/reservation-system/internal/render"
 )
 
 const portNumber string = ":3000"
