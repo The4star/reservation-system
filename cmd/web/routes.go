@@ -11,19 +11,24 @@ import (
 
 func routes(app *config.AppConfig) http.Handler {
 	router := chi.NewRouter()
-
 	router.Use(middleware.Recoverer)
-	router.Use(NoSurf)
 	router.Use(SessionLoad)
+
+	noSurfGroup := router.Group(nil)
+	noSurfGroup.Use(NoSurf)
 
 	//routes
 	router.Get("/", handlers.Repo.Home)
 	router.Get("/about", handlers.Repo.About)
-	router.Get("/rooms/standard-suite", handlers.Repo.StandardSuite)
-	router.Get("/rooms/deluxe-suite", handlers.Repo.DeluxeSuite)
-	router.Get("/availability", handlers.Repo.Availability)
 	router.Get("/book", handlers.Repo.Book)
 	router.Get("/contact", handlers.Repo.Contact)
+	router.Get("/rooms/standard-suite", handlers.Repo.StandardSuite)
+	router.Get("/rooms/deluxe-suite", handlers.Repo.DeluxeSuite)
+
+	noSurfGroup.Get("/availability", handlers.Repo.Availability)
+	noSurfGroup.Post("/availability", handlers.Repo.PostAvailability)
+
+	router.Post("/room-availability", handlers.Repo.RoomAvailability)
 
 	fileServer := http.FileServer(http.Dir("./static/"))
 	router.Handle("/static/*", http.StripPrefix("/static", fileServer))

@@ -1,3 +1,4 @@
+import { notification } from './helpers.js'
 import { datePickerModal } from './helpers.js'
 const html = `
     <form action="" method="GET" class="needs-validation" novalidate>
@@ -18,5 +19,36 @@ const html = `
         </form>
     `
 
+
+const openModal = () => {
+  datePickerModal({
+    html,
+    title: "Choose your dates",
+    callback: async (result) => {
+      const roomType = document.querySelector('#room-type').innerHTML
+      result.roomType = roomType
+      try {
+        const response = await axios.post("/room-availability", result)
+        const data = response.data;
+        console.log(data)
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  })
+  setTimeout(() => {
+    const form = document.querySelector('.needs-validation')
+    const confirmButton = document.querySelector('.swal2-confirm')
+    confirmButton.addEventListener('click', function (event) {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+        notification("error", "Please fill out the fields below")
+      }
+      form.classList.add('was-validated')
+    }, false)
+  }, 200);
+}
+
 const checkAvailabilityButton = document.querySelector('#check-availability')
-checkAvailabilityButton.addEventListener('click', () => datePickerModal({ html, title: "Choose your dates" }))
+checkAvailabilityButton.addEventListener('click', openModal)

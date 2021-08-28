@@ -44,12 +44,13 @@ const datePickerModal = async (options) => {
     title = "",
     html = ""
   } = options
-  const { value: formValues } = await Swal.fire({
+  const { value: result } = await Swal.fire({
     title,
     html,
     focusConfirm: false,
     showCancelButton: true,
     backdrop: false,
+    confirmButtonText: "Check Availability",
     willOpen: () => {
       const rangePicker = document.getElementById('reservation-dates-modal');
       new DateRangePicker(rangePicker, {
@@ -58,10 +59,15 @@ const datePickerModal = async (options) => {
       });
     },
     preConfirm: () => {
-      return [
-        document.getElementById('start-date-modal').value,
-        document.getElementById('end-date-modal').value
-      ]
+      const startDate = document.getElementById('start-date-modal').value
+      const endDate = document.getElementById('end-date-modal').value
+      if (startDate !== "" && endDate !== "") {
+        return {
+          startDate,
+          endDate
+        }
+      }
+      return false
     },
     didOpen: () => {
       document.getElementById('start-date-modal').removeAttribute('disabled'),
@@ -69,8 +75,12 @@ const datePickerModal = async (options) => {
     }
   })
 
-  if (formValues) {
-    Swal.fire(JSON.stringify(formValues))
+  if (result) {
+    if (result.startDate !== "") {
+      options.callback(result)
+    } else {
+      options.callback(false)
+    }
   }
 }
 

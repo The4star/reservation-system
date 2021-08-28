@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"text/template"
 
+	"github.com/justinas/nosurf"
 	"github.com/the4star/reservation-system/pkg/config"
 	"github.com/the4star/reservation-system/pkg/models"
 )
@@ -19,30 +20,33 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
-func AddDefaultData(data *models.TemplateData) *models.TemplateData {
+func AddDefaultData(data *models.TemplateData, r *http.Request) *models.TemplateData {
+	data.CSRFToken = nosurf.Token((r))
 	return data
 }
 
 // renders html templates
-func RenderTemplate(w http.ResponseWriter, tmpl string, data *models.TemplateData) {
+func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, data *models.TemplateData) {
 	var templateCache map[string]*template.Template
 	var err error
 	if app.UseCache {
 		//get the template cache from the app config
 		templateCache = app.TemplateCache
 	} else {
+		// rebuid cache on every request
 		templateCache, err = CreateTemplateCache()
 		if err != nil {
 			log.Fatal("unable to create fresh template cache")
 		}
 	}
+
 	template, ok := templateCache[tmpl]
 	if !ok {
 		log.Fatal("unable to find template from cache")
 	}
 
 	buf := new(bytes.Buffer)
-	data = AddDefaultData(data)
+	data = AddDefaultData(data, r)
 	err = template.Execute(buf, data)
 	if err != nil {
 		fmt.Println("Error writing template to browser:", err)
