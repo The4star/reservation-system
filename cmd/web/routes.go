@@ -20,14 +20,16 @@ func routes(app *config.AppConfig) http.Handler {
 	//routes
 	router.Get("/", handlers.Repo.Home)
 	router.Get("/about", handlers.Repo.About)
-	router.Get("/book", handlers.Repo.Book)
 	router.Get("/contact", handlers.Repo.Contact)
 	router.Get("/rooms/standard-suite", handlers.Repo.StandardSuite)
 	router.Get("/rooms/deluxe-suite", handlers.Repo.DeluxeSuite)
 
+	router.Get("/book", handlers.Repo.Book)
+	router.Post("/book", handlers.Repo.PostBook)
+	router.Get("/reservation-summary", handlers.Repo.ReservationSummary)
+
 	noSurfGroup.Get("/availability", handlers.Repo.Availability)
 	noSurfGroup.Post("/availability", handlers.Repo.PostAvailability)
-
 	router.Post("/room-availability", handlers.Repo.RoomAvailability)
 
 	fileServer := http.FileServer(http.Dir("./static/"))
