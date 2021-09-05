@@ -1,0 +1,26 @@
+mode: set
+github.com/the4star/reservation-system/internal/render/render.go:21.40,23.2 1 1
+github.com/the4star/reservation-system/internal/render/render.go:25.86,31.2 5 1
+github.com/the4star/reservation-system/internal/render/render.go:34.107,37.18 3 1
+github.com/the4star/reservation-system/internal/render/render.go:49.2,50.9 2 1
+github.com/the4star/reservation-system/internal/render/render.go:54.2,57.16 4 1
+github.com/the4star/reservation-system/internal/render/render.go:62.2,63.12 2 1
+github.com/the4star/reservation-system/internal/render/render.go:37.18,40.3 1 0
+github.com/the4star/reservation-system/internal/render/render.go:40.8,43.17 2 1
+github.com/the4star/reservation-system/internal/render/render.go:43.17,46.4 2 0
+github.com/the4star/reservation-system/internal/render/render.go:50.9,52.3 1 1
+github.com/the4star/reservation-system/internal/render/render.go:57.16,60.3 2 0
+github.com/the4star/reservation-system/internal/render/render.go:67.67,71.16 3 1
+github.com/the4star/reservation-system/internal/render/render.go:75.2,76.16 2 1
+github.com/the4star/reservation-system/internal/render/render.go:80.2,82.29 2 1
+github.com/the4star/reservation-system/internal/render/render.go:102.2,102.21 1 1
+github.com/the4star/reservation-system/internal/render/render.go:71.16,73.3 1 0
+github.com/the4star/reservation-system/internal/render/render.go:76.16,78.3 1 0
+github.com/the4star/reservation-system/internal/render/render.go:82.29,85.17 3 1
+github.com/the4star/reservation-system/internal/render/render.go:88.3,89.17 2 1
+github.com/the4star/reservation-system/internal/render/render.go:93.3,93.23 1 1
+github.com/the4star/reservation-system/internal/render/render.go:99.3,99.21 1 1
+github.com/the4star/reservation-system/internal/render/render.go:85.17,87.4 1 0
+github.com/the4star/reservation-system/internal/render/render.go:89.17,91.4 1 0
+github.com/the4star/reservation-system/internal/render/render.go:93.23,95.18 2 1
+github.com/the4star/reservation-system/internal/render/render.go:95.18,97.5 1 0
