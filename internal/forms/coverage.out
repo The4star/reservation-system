@@ -1,0 +1,18 @@
+mode: set
+github.com/the4star/reservation-system/internal/forms/forms.go:17.29,19.2 1 1
+github.com/the4star/reservation-system/internal/forms/forms.go:22.33,27.2 1 1
+github.com/the4star/reservation-system/internal/forms/forms.go:30.43,31.31 1 1
+github.com/the4star/reservation-system/internal/forms/forms.go:31.31,33.41 2 1
+github.com/the4star/reservation-system/internal/forms/forms.go:33.41,35.4 1 1
+github.com/the4star/reservation-system/internal/forms/forms.go:40.39,42.13 2 1
+github.com/the4star/reservation-system/internal/forms/forms.go:46.2,46.13 1 1
+github.com/the4star/reservation-system/internal/forms/forms.go:42.13,45.3 2 1
+github.com/the4star/reservation-system/internal/forms/forms.go:50.57,52.21 2 1
+github.com/the4star/reservation-system/internal/forms/forms.go:56.2,56.13 1 1
+github.com/the4star/reservation-system/internal/forms/forms.go:52.21,55.3 2 1
+github.com/the4star/reservation-system/internal/forms/forms.go:60.38,61.40 1 1
+github.com/the4star/reservation-system/internal/forms/forms.go:61.40,63.3 1 1
+github.com/the4star/reservation-system/internal/forms/form-errors.go:6.44,8.2 1 1
+github.com/the4star/reservation-system/internal/forms/form-errors.go:11.42,13.27 2 1
+github.com/the4star/reservation-system/internal/forms/form-errors.go:17.2,17.23 1 1
+github.com/the4star/reservation-system/internal/forms/form-errors.go:13.27,15.3 1 1
