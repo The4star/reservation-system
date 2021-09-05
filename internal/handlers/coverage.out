@@ -1,0 +1,22 @@
+mode: set
+github.com/the4star/reservation-system/internal/handlers/handlers.go:25.47,29.2 1 1
+github.com/the4star/reservation-system/internal/handlers/handlers.go:32.33,34.2 1 1
+github.com/the4star/reservation-system/internal/handlers/handlers.go:37.67,39.2 1 1
+github.com/the4star/reservation-system/internal/handlers/handlers.go:42.68,44.2 1 1
+github.com/the4star/reservation-system/internal/handlers/handlers.go:47.76,49.2 1 1
+github.com/the4star/reservation-system/internal/handlers/handlers.go:52.74,54.2 1 1
+github.com/the4star/reservation-system/internal/handlers/handlers.go:57.75,59.2 1 1
+github.com/the4star/reservation-system/internal/handlers/handlers.go:62.79,68.2 4 1
+github.com/the4star/reservation-system/internal/handlers/handlers.go:81.79,94.16 7 1
+github.com/the4star/reservation-system/internal/handlers/handlers.go:98.2,99.14 2 1
+github.com/the4star/reservation-system/internal/handlers/handlers.go:94.16,96.3 1 0
+github.com/the4star/reservation-system/internal/handlers/handlers.go:103.67,111.2 4 1
+github.com/the4star/reservation-system/internal/handlers/handlers.go:114.71,116.16 2 1
+github.com/the4star/reservation-system/internal/handlers/handlers.go:120.2,131.19 6 1
+github.com/the4star/reservation-system/internal/handlers/handlers.go:143.2,144.66 2 1
+github.com/the4star/reservation-system/internal/handlers/handlers.go:116.16,119.3 2 0
+github.com/the4star/reservation-system/internal/handlers/handlers.go:131.19,140.3 5 0
+github.com/the4star/reservation-system/internal/handlers/handlers.go:148.70,150.2 1 1
+github.com/the4star/reservation-system/internal/handlers/handlers.go:152.81,154.9 2 1
+github.com/the4star/reservation-system/internal/handlers/handlers.go:160.2,165.4 4 0
+github.com/the4star/reservation-system/internal/handlers/handlers.go:154.9,159.3 4 1
