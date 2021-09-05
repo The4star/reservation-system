@@ -26,7 +26,6 @@ var session *scs.SessionManager
 var pathToTemplates string = "../../templates"
 
 func TestMain(m *testing.M) {
-
 	os.Exit(m.Run())
 }
 
@@ -48,7 +47,7 @@ func getRoutes() http.Handler {
 	}
 
 	app.TemplateCache = templateCache
-	app.UseCache = false
+	app.UseCache = true
 
 	repo := NewRepo(&app)
 	NewHandlers(repo)
@@ -59,7 +58,7 @@ func getRoutes() http.Handler {
 	router.Use(SessionLoad)
 
 	noSurfGroup := router.Group(nil)
-	noSurfGroup.Use(NoSurf)
+	// noSurfGroup.Use(NoSurf)
 
 	//routes
 	router.Get("/", Repo.Home)
