@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -31,7 +32,7 @@ var theTests = []test{
 	{"deluxe suite", "/rooms/deluxe-suite", "GET", []postData{}, http.StatusOK, "none"},
 	{"book", "/book", "GET", []postData{}, http.StatusOK, "none"},
 	{"reservation summary", "/reservation-summary", "GET", []postData{}, http.StatusOK, "none"},
-	{"availablity", "/availability", "GET", []postData{}, http.StatusOK, "none"},
+	{"availabilty", "/availability", "GET", []postData{}, http.StatusOK, "none"},
 	{"check availability", "/availability", "POST", []postData{
 		{key: "start-date", value: "2022-01-01"},
 		{key: "end-date", value: "2022-01-02"},
@@ -57,8 +58,10 @@ func TestHandlers(t *testing.T) {
 	for _, test := range theTests {
 		if test.method == "GET" {
 			// test get route
+			fmt.Println(test)
 			resp, err := testServer.Client().Get(testServer.URL + test.url)
 			if err != nil {
+				t.Log("Here")
 				t.Log(err)
 				t.Fatal(err)
 			}
