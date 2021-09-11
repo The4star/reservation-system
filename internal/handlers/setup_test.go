@@ -16,6 +16,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/justinas/nosurf"
 	"github.com/the4star/reservation-system/internal/config"
+	"github.com/the4star/reservation-system/internal/helpers"
 	"github.com/the4star/reservation-system/internal/models"
 	"github.com/the4star/reservation-system/internal/render"
 )
@@ -24,6 +25,8 @@ var app config.AppConfig
 var functions = template.FuncMap{}
 var session *scs.SessionManager
 var pathToTemplates string = "../../templates"
+var infoLog *log.Logger
+var errorLog *log.Logger
 
 func TestMain(m *testing.M) {
 	os.Exit(m.Run())
@@ -33,6 +36,12 @@ func getRoutes() http.Handler {
 	gob.Register(models.Reservation{})
 
 	app.InProduction = false
+
+	// create loggers
+	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	app.InfoLog = infoLog
+	errorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLog
 
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour
@@ -52,7 +61,7 @@ func getRoutes() http.Handler {
 	repo := NewRepo(&app)
 	NewHandlers(repo)
 	render.NewTemplates(&app)
-
+	helpers.NewHelpers(&app)
 	router := chi.NewRouter()
 	router.Use(middleware.Recoverer)
 	router.Use(SessionLoad)
