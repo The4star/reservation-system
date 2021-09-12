@@ -9,7 +9,9 @@ import (
 	"time"
 
 	"github.com/alexedwards/scs/v2"
+	"github.com/joho/godotenv"
 	"github.com/the4star/reservation-system/internal/config"
+	"github.com/the4star/reservation-system/internal/driver"
 	"github.com/the4star/reservation-system/internal/handlers"
 	"github.com/the4star/reservation-system/internal/helpers"
 	"github.com/the4star/reservation-system/internal/models"
@@ -24,10 +26,12 @@ var infoLog *log.Logger
 var errorLog *log.Logger
 
 func main() {
-	err := run()
+	db, err := run()
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.SQL.Close()
+
 	fmt.Println("Starting application on port", portNumber)
 	srv := &http.Server{
 		Addr:    portNumber,
@@ -39,7 +43,10 @@ func main() {
 	}
 }
 
-func run() error {
+func run() (*driver.DB, error) {
+	//load env variables
+	godotenv.Load()
+
 	// What am i going to put in the session?
 	gob.Register(models.Reservation{})
 
@@ -58,19 +65,28 @@ func run() error {
 	session.Cookie.Secure = app.InProduction
 	app.Session = session
 
+	// connect to database
+	log.Println("Connecting to database")
+	db, err := driver.ConnectSQl(os.Getenv("DATABASE_URL"))
+	if err != nil {
+		log.Fatal("cannot connect to database")
+		return nil, err
+	}
+	log.Println("Connected to database")
+
 	templateCache, err := render.CreateTemplateCache()
 	if err != nil {
 		log.Fatal("cannot create template cache.")
-		return err
+		return nil, err
 	}
 
 	app.TemplateCache = templateCache
 	app.UseCache = false
 
-	repo := handlers.NewRepo(&app)
+	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
 	render.NewTemplates(&app)
 	helpers.NewHelpers(&app)
 
-	return nil
+	return db, nil
 }

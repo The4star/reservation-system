@@ -7,10 +7,13 @@ import (
 	"net/http"
 
 	"github.com/the4star/reservation-system/internal/config"
+	"github.com/the4star/reservation-system/internal/driver"
 	"github.com/the4star/reservation-system/internal/forms"
 	"github.com/the4star/reservation-system/internal/helpers"
 	"github.com/the4star/reservation-system/internal/models"
 	"github.com/the4star/reservation-system/internal/render"
+	"github.com/the4star/reservation-system/internal/repository"
+	"github.com/the4star/reservation-system/internal/repository/dbrepo"
 )
 
 // the repository used by the handlers
@@ -19,12 +22,14 @@ var Repo *Repository
 // the repository type
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseRepo
 }
 
 //creates a new repository
-func NewRepo(a *config.AppConfig) *Repository {
+func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	return &Repository{
 		App: a,
+		DB:  dbrepo.NewPostgresRepo(db.SQL, a),
 	}
 }
 
