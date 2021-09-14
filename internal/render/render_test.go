@@ -21,7 +21,7 @@ func TestAddDefaultData(t *testing.T) {
 	}
 }
 
-func TestRenderTemplate(t *testing.T) {
+func TestTemplate(t *testing.T) {
 	pathToTemplates = "../../templates"
 	templateCache, err := CreateTemplateCache()
 	if err != nil {
@@ -36,19 +36,19 @@ func TestRenderTemplate(t *testing.T) {
 
 	var ww myWriter
 
-	err = RenderTemplate(&ww, request, "home.page.tmpl", &models.TemplateData{})
+	err = Template(&ww, request, "home.page.tmpl", &models.TemplateData{})
 	if err != nil {
 		t.Error(err)
 	}
 
-	err = RenderTemplate(&ww, request, "non-existent.page.tmpl", &models.TemplateData{})
+	err = Template(&ww, request, "non-existent.page.tmpl", &models.TemplateData{})
 	if err == nil {
 		t.Error("Expected an error but did not get one")
 	}
 }
 
 func TestNewTemplates(t *testing.T) {
-	NewTemplates(app)
+	NewRenderer(app)
 }
 
 func TestCreateTemplateCache(t *testing.T) {

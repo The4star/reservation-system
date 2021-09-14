@@ -40,27 +40,27 @@ func NewHandlers(r *Repository) {
 
 // Home renders the home page
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, r, "home.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "home.page.tmpl", &models.TemplateData{})
 }
 
 // About renders the about page
 func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, r, "about.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "about.page.tmpl", &models.TemplateData{})
 }
 
 // StandardSuite renders the standard suite page
 func (m *Repository) StandardSuite(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, r, "standard-suite.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "standard-suite.page.tmpl", &models.TemplateData{})
 }
 
 // DeluxeSuite renders the deluxe suite page
 func (m *Repository) DeluxeSuite(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, r, "deluxe-suite.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "deluxe-suite.page.tmpl", &models.TemplateData{})
 }
 
 // Availability renders the availability page
 func (m *Repository) Availability(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, r, "availability.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "availability.page.tmpl", &models.TemplateData{})
 }
 
 // PostAvailability handles the availability page form
@@ -110,7 +110,7 @@ func (m *Repository) Book(w http.ResponseWriter, r *http.Request) {
 	var emptyReservation models.Reservation
 	data := make(map[string]interface{})
 	data["reservation"] = emptyReservation
-	render.RenderTemplate(w, r, "book.page.tmpl", &models.TemplateData{
+	render.Template(w, r, "book.page.tmpl", &models.TemplateData{
 		Form: forms.New(nil),
 		Data: data,
 	})
@@ -138,7 +138,7 @@ func (m *Repository) PostBook(w http.ResponseWriter, r *http.Request) {
 		data := make(map[string]interface{})
 		data["reservation"] = reservation
 		fmt.Println(form)
-		render.RenderTemplate(w, r, "book.page.tmpl", &models.TemplateData{
+		render.Template(w, r, "book.page.tmpl", &models.TemplateData{
 			Form: form,
 			Data: data,
 		})
@@ -152,7 +152,7 @@ func (m *Repository) PostBook(w http.ResponseWriter, r *http.Request) {
 
 // Contact renders the contact page
 func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, r, "contact.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "contact.page.tmpl", &models.TemplateData{})
 }
 
 func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) {
@@ -166,7 +166,7 @@ func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) 
 	m.App.Session.Remove(r.Context(), "reservation")
 	data := make(map[string]interface{})
 	data["reservation"] = reservation
-	render.RenderTemplate(w, r, "reservation-summary.page.tmpl", &models.TemplateData{
+	render.Template(w, r, "reservation-summary.page.tmpl", &models.TemplateData{
 		Data: data,
 	})
 }
