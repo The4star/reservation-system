@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/the4star/reservation-system/internal/config"
 	"github.com/the4star/reservation-system/internal/driver"
@@ -86,6 +88,7 @@ type roomAvailabilityResponse struct {
 func (m *Repository) RoomAvailability(w http.ResponseWriter, r *http.Request) {
 	jsonData := roomAvailabilityRequest{}
 	data, _ := io.ReadAll(r.Body)
+
 	json.Unmarshal(data, &jsonData)
 
 	fmt.Printf("%+v", jsonData)
@@ -123,17 +126,40 @@ func (m *Repository) PostBook(w http.ResponseWriter, r *http.Request) {
 		helpers.ServerError(w, err)
 		return
 	}
+
+	sd := r.Form.Get("start-date")
+	ed := r.Form.Get("end-date")
+
+	timeLayout := "2006-01-02"
+	startDate, err := time.Parse(timeLayout, sd)
+	if err != nil {
+		helpers.ServerError(w, err)
+	}
+	endDate, err := time.Parse(timeLayout, ed)
+	if err != nil {
+		helpers.ServerError(w, err)
+	}
+
+	RoomID, err := strconv.Atoi(r.Form.Get("room-id"))
+	if err != nil {
+		helpers.ServerError(w, err)
+	}
+
 	reservation := models.Reservation{
 		FirstName: r.Form.Get("first-name"),
 		LastName:  r.Form.Get("last-name"),
 		Phone:     r.Form.Get("phone"),
 		Email:     r.Form.Get("email"),
+		StartDate: startDate,
+		EndDate:   endDate,
+		RoomID:    RoomID,
 	}
 
 	form := forms.New(r.PostForm)
 	form.Required("first-name", "last-name", "email")
 	form.MinLength("first-name", 3)
 	form.IsEmail("email")
+
 	if !form.Valid() {
 		data := make(map[string]interface{})
 		data["reservation"] = reservation
@@ -145,6 +171,11 @@ func (m *Repository) PostBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//save to db
+	err = m.DB.InsertReservation(reservation)
+	if err != nil {
+		helpers.ServerError(w, err)
+	}
 	//redirect to summary if form validation passes
 	m.App.Session.Put(r.Context(), "reservation", reservation)
 	http.Redirect(w, r, "/reservation-summary", http.StatusSeeOther)

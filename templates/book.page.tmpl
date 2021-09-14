@@ -66,6 +66,21 @@
             value="{{$reservation.Phone}}"
           >
         </div>
+        <div class="row" id="reservation-dates">
+          <div class="col">
+            <div class="mb-3">
+              <input required type="text" class="form-control" id="start-date" name="start-date" autocomplete="off"
+                placeholder="Arrival">
+            </div>
+          </div>
+          <div class="col">
+            <div class="mb-3">
+              <input required type="text" class="form-control" id="end-date" name="end-date" autocomplete="off"
+                placeholder="Departure">
+            </div>
+          </div>
+        </div>
+        <input type="hidden" name="room-id" value="3">
         <button type="submit" class="btn btn-primary">Make Reservation</button>
       </form>
     </div>
@@ -74,5 +89,6 @@
 {{end}}
 
 {{define "js"}}
+<script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/js/datepicker-full.min.js"></script>
 <script src="/static/scripts/book.js" type="module"></script>
 {{end}}
