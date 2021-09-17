@@ -1,5 +1,6 @@
 import { notification } from './helpers.js'
 import { datePickerModal } from './helpers.js'
+const checkAvailabilityButton = document.querySelector('#check-availability')
 const html = `
     <form action="" method="GET" class="needs-validation" novalidate>
           <div class="row" id="reservation-dates-modal">
@@ -50,5 +51,4 @@ const openModal = () => {
   }, 200);
 }
 
-const checkAvailabilityButton = document.querySelector('#check-availability')
 checkAvailabilityButton.addEventListener('click', openModal)

@@ -16,16 +16,20 @@
             <td>{{$reservation.FirstName}} {{$reservation.LastName}}</td>
           </tr>
           <tr>
+            <td>Room:</td>
+            <td>{{$reservation.Room.RoomName}}</td>
+          </tr>
+          <tr>
             <td>
               Arrival:
             </td>
-            <td></td>
+            <td>{{index .StringMap "start-date"}}</td>
           </tr>
           <tr>
             <td>
               Departure:
             </td>
-            <td></td>
+            <td>{{index .StringMap "end-date"}}</td>
           </tr>
           <tr>
             <td>

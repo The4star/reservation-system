@@ -55,7 +55,8 @@ const datePickerModal = async (options) => {
       const rangePicker = document.getElementById('reservation-dates-modal');
       new DateRangePicker(rangePicker, {
         format: "yyyy-mm-dd",
-        showOnFocus: true
+        showOnFocus: true,
+        minDate: new Date()
       });
     },
     preConfirm: () => {
@@ -70,8 +71,8 @@ const datePickerModal = async (options) => {
       return false
     },
     didOpen: () => {
-      document.getElementById('start-date-modal').removeAttribute('disabled'),
-        document.getElementById('end-date-modal').removeAttribute('disabled')
+      document.getElementById('start-date-modal').removeAttribute('disabled')
+      document.getElementById('end-date-modal').removeAttribute('disabled')
     }
   })
 
