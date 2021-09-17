@@ -26,8 +26,8 @@ const openModal = () => {
     html,
     title: "Choose your dates",
     callback: async (result) => {
-      const roomType = document.querySelector('#room-type').innerHTML
-      result.roomType = roomType
+      const roomType = document.querySelector('#room-type')
+      result.roomID = roomType.dataset.roomid
       try {
         const response = await axios.post("/room-availability", result)
         const data = response.data;

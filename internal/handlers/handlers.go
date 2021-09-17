@@ -132,11 +132,10 @@ func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 type roomAvailabilityRequest struct {
 	StartDate string `json:"startDate"`
 	EndDate   string `json:"endDate"`
-	RoomType  string `json:"roomType"`
+	RoomID    string `json:"roomID"`
 }
 type roomAvailabilityResponse struct {
-	OK      bool   `json:"ok"`
-	Message string `json:"message"`
+	OK bool `json:"ok"`
 }
 
 // RoomAvailability handles the form on room pages
@@ -148,19 +147,41 @@ func (m *Repository) PostRoomAvailability(w http.ResponseWriter, r *http.Request
 
 	fmt.Printf("%+v", jsonData)
 
-	resp := roomAvailabilityResponse{
-		OK:      true,
-		Message: "Available",
+	timeLayout := "2006-01-02"
+	startDate, err := time.Parse(timeLayout, jsonData.StartDate)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	endDate, err := time.Parse(timeLayout, jsonData.EndDate)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	roomID, err := strconv.Atoi(jsonData.RoomID)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
 	}
 
-	out, err := json.MarshalIndent(resp, "", "  ")
+	available, err := m.DB.SearchAvailabilityByDatesByRoomID(roomID, startDate, endDate)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	resp := roomAvailabilityResponse{
+		OK: available,
+	}
+
+	responseData, err := json.Marshal(resp)
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(out)
+	w.Write(responseData)
 }
 
 // Book renders the book page
