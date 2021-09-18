@@ -67,6 +67,7 @@ func (m *Repository) Availability(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "availability.page.tmpl", &models.TemplateData{})
 }
 
+// ChooseRoom sets the room the user has chosen and redirects to the book page
 func (m *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
 	roomID, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
@@ -182,6 +183,46 @@ func (m *Repository) PostRoomAvailability(w http.ResponseWriter, r *http.Request
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(responseData)
+}
+
+// BookRoom renders the booking page using params
+func (m *Repository) BookRoom(w http.ResponseWriter, r *http.Request) {
+	roomID, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	sd := r.URL.Query().Get("sd")
+	ed := r.URL.Query().Get("ed")
+
+	timeLayout := "2006-01-02"
+	startDate, err := time.Parse(timeLayout, sd)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	endDate, err := time.Parse(timeLayout, ed)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	room, err := m.DB.GetRoomByID(roomID)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	var res models.Reservation
+
+	res.RoomID = roomID
+	res.StartDate = startDate
+	res.EndDate = endDate
+	res.Room.RoomName = room.RoomName
+
+	m.App.Session.Put(r.Context(), "reservation", res)
+
+	http.Redirect(w, r, "/book", http.StatusSeeOther)
 }
 
 // Book renders the book page

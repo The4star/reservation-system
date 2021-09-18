@@ -24,6 +24,7 @@ func routes(app *config.AppConfig) http.Handler {
 	router.Get("/rooms/standard-suite", handlers.Repo.StandardSuite)
 	router.Get("/rooms/deluxe-suite", handlers.Repo.DeluxeSuite)
 	router.Get("/choose-room/{id}", handlers.Repo.ChooseRoom)
+	router.Get("/book-room", handlers.Repo.BookRoom)
 
 	router.Get("/book", handlers.Repo.Book)
 	router.Post("/book", handlers.Repo.PostBook)

@@ -14,6 +14,28 @@ const modal = (title, text, icon, confirmButtonText) => {
   })
 }
 
+const customModal = (options) => {
+  const {
+    title = "",
+    text = "",
+    icon = "",
+    showConfirmButton = false,
+    showCancelButton = true,
+    confirmButtonText = "",
+    html = ""
+  } = options
+
+  Swal.fire({
+    title,
+    text,
+    icon,
+    showConfirmButton,
+    confirmButtonText,
+    showCancelButton,
+    html
+  })
+}
+
 
 const toast = (options) => {
   const {
@@ -89,5 +111,6 @@ export {
   notification,
   modal,
   toast,
-  datePickerModal
+  datePickerModal,
+  customModal
 }

@@ -1,4 +1,4 @@
-import { notification } from './helpers.js'
+import { notification, modal, customModal } from './helpers.js'
 import { datePickerModal } from './helpers.js'
 const checkAvailabilityButton = document.querySelector('#check-availability')
 const html = `
@@ -27,11 +27,28 @@ const openModal = () => {
     title: "Choose your dates",
     callback: async (result) => {
       const roomType = document.querySelector('#room-type')
-      result.roomID = roomType.dataset.roomid
+      const roomID = roomType.dataset.roomid
+      const roomName = roomType.innerHTML
+      result.roomID = roomID
       try {
         const response = await axios.post("/room-availability", result)
         const data = response.data;
-        console.log(data)
+        if (data.ok) {
+          customModal({
+            title: `The ${roomName} is available`,
+            text: `Would you like to book the ${roomName}`,
+            icon: "success",
+            showConfirmationButton: false,
+            showCancelButton: true,
+            html: `
+              <p>
+                <a href="/book-room?id=${roomID}&sd=${result.startDate}&ed=${result.endDate}" class="btn btn-primary mt-1">Book Now</a>
+              </p>
+            `
+          })
+        } else {
+          modal("Room is not available", "Please try alternative dates", "error", "OK")
+        }
       } catch (error) {
         console.log(error);
       }
