@@ -348,6 +348,37 @@ func (m *Repository) PostBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//send notifications
+	guestMessage := fmt.Sprintf(`
+		<p><strong>Reservation Confirmed</strong></p>
+		<p>Dear %s,<p>
+		<p>This is to confirm your reservation for the %s from %s to %s.</p>
+	`, reservation.FirstName, reservation.Room.RoomName, reservation.StartDate, reservation.EndDate)
+
+	hotelMessage := fmt.Sprintf(`
+		<p><strong>Reservation Confirmed</strong></p>
+		<p>Dear Owner,</p>
+		<p>This is to confirm a new reservation in the %s from %s to %s.</p>
+	`, reservation.Room.RoomName, reservation.StartDate, reservation.EndDate)
+
+	sendEmail(
+		m.App,
+		reservation.Email,
+		"mail@4starOnRegent.com",
+		"Reservation Confirmation",
+		guestMessage,
+		"basic.html",
+	)
+
+	sendEmail(
+		m.App,
+		"owner@4staronregent.com",
+		"mail@4staronregent.com",
+		"Reservation Confirmation",
+		hotelMessage,
+		"basic.html",
+	)
+
 	//redirect to summary if form validation passes
 	m.App.Session.Put(r.Context(), "reservation", reservation)
 	http.Redirect(w, r, "/reservation-summary", http.StatusSeeOther)

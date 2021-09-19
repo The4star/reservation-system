@@ -46,6 +46,11 @@ func TestMain(m *testing.M) {
 	session.Cookie.Secure = app.InProduction
 	app.Session = session
 
+	mailChan := make(chan models.MailData)
+	app.MailChan = mailChan
+	defer close(mailChan)
+	listenForMail()
+
 	templateCache, err := CreateTestTemplateCache()
 	if err != nil {
 		log.Fatal("cannot create template cache.")
@@ -87,6 +92,15 @@ func getRoutes() http.Handler {
 	fileServer := http.FileServer(http.Dir("./static/"))
 	router.Handle("/static/*", http.StripPrefix("/static", fileServer))
 	return router
+}
+
+func listenForMail() {
+	go func() {
+		for {
+			_ = <-app.MailChan
+
+		}
+	}()
 }
 
 // adds csrf protection to all POST requests.
