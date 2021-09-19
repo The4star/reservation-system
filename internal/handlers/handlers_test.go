@@ -423,6 +423,73 @@ func TestPostRoomAvailability(t *testing.T) {
 	}
 }
 
+func TestBookRoom(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/book-room?id=1&sd=2060-01-01&ed=2060-01-04", nil)
+	ctx := getCTX(req)
+	req = req.WithContext(ctx)
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(Repo.BookRoom)
+	handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("Post Book handler returned wrong response code, got %d wanted %d", rr.Code, http.StatusSeeOther)
+	}
+
+	// test db failed
+	req, _ = http.NewRequest("GET", "/book-room?id=100&sd=2060-01-01&ed=2060-01-04", nil)
+	ctx = getCTX(req)
+	req = req.WithContext(ctx)
+	rr = httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusTemporaryRedirect {
+		t.Errorf("Post Book handler returned wrong response code, got %d wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	}
+}
+
+func TestReservationSummary(t *testing.T) {
+	timeLayout := "2006-01-02"
+	startDate, err := time.Parse(timeLayout, "2050-02-01")
+	if err != nil {
+		fmt.Println(err)
+	}
+	endDate, err := time.Parse(timeLayout, "2050-02-03")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	reservation := models.Reservation{
+		RoomID:    1,
+		StartDate: startDate,
+		EndDate:   endDate,
+		Room: models.Room{
+			RoomName: "Standard Suite",
+		},
+	}
+
+	req, _ := http.NewRequest("GET", "/reservation-summary", nil)
+	ctx := getCTX(req)
+	req = req.WithContext(ctx)
+	session.Put(req.Context(), "reservation", reservation)
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(Repo.ReservationSummary)
+	handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Errorf("Post Book handler returned wrong response code, got %d wanted %d", rr.Code, http.StatusOK)
+	}
+
+	// test with no reservation in session
+	req, _ = http.NewRequest("GET", "/reservation-summary", nil)
+	ctx = getCTX(req)
+	req = req.WithContext(ctx)
+	rr = httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusTemporaryRedirect {
+		t.Errorf("Post Book handler returned wrong response code, got %d wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	}
+
+}
+
 func getCTX(req *http.Request) context.Context {
 	ctx, err := session.Load(req.Context(), req.Header.Get("X-Session"))
 	if err != nil {

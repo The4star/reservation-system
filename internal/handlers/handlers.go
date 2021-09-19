@@ -12,7 +12,6 @@ import (
 	"github.com/the4star/reservation-system/internal/config"
 	"github.com/the4star/reservation-system/internal/driver"
 	"github.com/the4star/reservation-system/internal/forms"
-	"github.com/the4star/reservation-system/internal/helpers"
 	"github.com/the4star/reservation-system/internal/models"
 	"github.com/the4star/reservation-system/internal/render"
 	"github.com/the4star/reservation-system/internal/repository"
@@ -179,51 +178,24 @@ func (m *Repository) PostRoomAvailability(w http.ResponseWriter, r *http.Request
 	timeLayout := "2006-01-02"
 	startDate, err := time.Parse(timeLayout, jsonData.StartDate)
 	if err != nil {
-		resp := roomAvailabilityResponse{
-			OK:  false,
-			Msg: "Internal server error",
-		}
-
-		responseData, _ := json.Marshal(resp)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(responseData)
+		internalServerErrorJSON(w)
 		return
 	}
 	endDate, err := time.Parse(timeLayout, jsonData.EndDate)
 	if err != nil {
-		resp := roomAvailabilityResponse{
-			OK:  false,
-			Msg: "Internal server error",
-		}
-
-		responseData, _ := json.Marshal(resp)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(responseData)
+		internalServerErrorJSON(w)
 		return
 	}
+
 	roomID, err := strconv.Atoi(jsonData.RoomID)
 	if err != nil {
-		resp := roomAvailabilityResponse{
-			OK:  false,
-			Msg: "Internal server error",
-		}
-
-		responseData, _ := json.Marshal(resp)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(responseData)
+		internalServerErrorJSON(w)
 		return
 	}
 
 	available, err := m.DB.SearchAvailabilityByDatesByRoomID(roomID, startDate, endDate)
 	if err != nil {
-		resp := roomAvailabilityResponse{
-			OK:  false,
-			Msg: "Internal server error",
-		}
-
-		responseData, _ := json.Marshal(resp)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(responseData)
+		internalServerErrorJSON(w)
 		return
 	}
 
@@ -233,8 +205,7 @@ func (m *Repository) PostRoomAvailability(w http.ResponseWriter, r *http.Request
 
 	responseData, err := json.Marshal(resp)
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(responseData)
+		internalServerErrorJSON(w)
 		return
 	}
 
@@ -245,7 +216,8 @@ func (m *Repository) PostRoomAvailability(w http.ResponseWriter, r *http.Request
 func (m *Repository) BookRoom(w http.ResponseWriter, r *http.Request) {
 	roomID, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
-		helpers.ServerError(w, err)
+		m.App.Session.Put(r.Context(), "error", "Error processing request")
+		http.Redirect(w, r, "/availability", http.StatusTemporaryRedirect)
 		return
 	}
 	sd := r.URL.Query().Get("sd")
@@ -254,18 +226,20 @@ func (m *Repository) BookRoom(w http.ResponseWriter, r *http.Request) {
 	timeLayout := "2006-01-02"
 	startDate, err := time.Parse(timeLayout, sd)
 	if err != nil {
-		helpers.ServerError(w, err)
+		m.App.Session.Put(r.Context(), "error", "Error processing request")
+		http.Redirect(w, r, "/availability", http.StatusTemporaryRedirect)
 		return
 	}
 	endDate, err := time.Parse(timeLayout, ed)
 	if err != nil {
-		helpers.ServerError(w, err)
+		m.App.Session.Put(r.Context(), "error", "Error processing request")
+		http.Redirect(w, r, "/availability", http.StatusTemporaryRedirect)
 		return
 	}
-
 	room, err := m.DB.GetRoomByID(roomID)
 	if err != nil {
-		helpers.ServerError(w, err)
+		m.App.Session.Put(r.Context(), "error", "Error processing request")
+		http.Redirect(w, r, "/availability", http.StatusTemporaryRedirect)
 		return
 	}
 
