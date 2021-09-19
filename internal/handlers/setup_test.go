@@ -97,8 +97,7 @@ func getRoutes() http.Handler {
 func listenForMail() {
 	go func() {
 		for {
-			_ = <-app.MailChan
-
+			<-app.MailChan
 		}
 	}()
 }
