@@ -30,13 +30,20 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// close channels and db that are running
 	defer db.SQL.Close()
+	defer close(app.MailChan)
+
+	// start email go routine
+	app.InfoLog.Println("Starting Mail Routine...")
+	listenForMail()
 
 	fmt.Println("Starting application on port", portNumber)
 	srv := &http.Server{
 		Addr:    portNumber,
 		Handler: routes(&app),
 	}
+
 	err = srv.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
@@ -53,6 +60,9 @@ func run() (*driver.DB, error) {
 	gob.Register(models.Room{})
 	gob.Register(models.Restriction{})
 
+	//create mail channel
+	mailChan := make(chan models.MailData)
+	app.MailChan = mailChan
 	app.InProduction = false
 
 	// create loggers
