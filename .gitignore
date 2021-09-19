@@ -1,2 +1,4 @@
 .idea
 reservation-system
+database.yml
+.env

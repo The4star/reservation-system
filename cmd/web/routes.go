@@ -23,6 +23,8 @@ func routes(app *config.AppConfig) http.Handler {
 	router.Get("/contact", handlers.Repo.Contact)
 	router.Get("/rooms/standard-suite", handlers.Repo.StandardSuite)
 	router.Get("/rooms/deluxe-suite", handlers.Repo.DeluxeSuite)
+	router.Get("/choose-room/{id}", handlers.Repo.ChooseRoom)
+	router.Get("/book-room", handlers.Repo.BookRoom)
 
 	router.Get("/book", handlers.Repo.Book)
 	router.Post("/book", handlers.Repo.PostBook)
@@ -30,7 +32,7 @@ func routes(app *config.AppConfig) http.Handler {
 
 	noSurfGroup.Get("/availability", handlers.Repo.Availability)
 	noSurfGroup.Post("/availability", handlers.Repo.PostAvailability)
-	router.Post("/room-availability", handlers.Repo.RoomAvailability)
+	router.Post("/room-availability", handlers.Repo.PostRoomAvailability)
 
 	fileServer := http.FileServer(http.Dir("./static/"))
 	router.Handle("/static/*", http.StripPrefix("/static", fileServer))

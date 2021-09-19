@@ -29,10 +29,6 @@ var infoLog *log.Logger
 var errorLog *log.Logger
 
 func TestMain(m *testing.M) {
-	os.Exit(m.Run())
-}
-
-func getRoutes() http.Handler {
 	gob.Register(models.Reservation{})
 
 	app.InProduction = false
@@ -58,9 +54,13 @@ func getRoutes() http.Handler {
 	app.TemplateCache = templateCache
 	app.UseCache = true
 
-	repo := NewRepo(&app)
+	repo := NewTestRepo(&app)
 	NewHandlers(repo)
-	render.NewTemplates(&app)
+	render.NewRenderer(&app)
+	os.Exit(m.Run())
+}
+
+func getRoutes() http.Handler {
 	helpers.NewHelpers(&app)
 	router := chi.NewRouter()
 	router.Use(middleware.Recoverer)
@@ -82,7 +82,7 @@ func getRoutes() http.Handler {
 
 	noSurfGroup.Get("/availability", Repo.Availability)
 	noSurfGroup.Post("/availability", Repo.PostAvailability)
-	router.Post("/room-availability", Repo.RoomAvailability)
+	router.Post("/room-availability", Repo.PostRoomAvailability)
 
 	fileServer := http.FileServer(http.Dir("./static/"))
 	router.Handle("/static/*", http.StripPrefix("/static", fileServer))

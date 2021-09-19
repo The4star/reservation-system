@@ -14,5 +14,6 @@ form.addEventListener('submit', function (event) {
 
 const rangePicker = document.getElementById('reservation-dates');
 new DateRangePicker(rangePicker, {
-  format: "yyyy-mm-dd"
+  format: "yyyy-mm-dd",
+  minDate: new Date()
 });

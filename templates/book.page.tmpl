@@ -4,11 +4,18 @@
   <div class="row">
     <div class="col-md-3"></div>
     <div class="col-md-6">
-      <h1 class="mt-5">Make a reservation</h1>
       {{$reservation := index .Data "reservation" }}
+      <h1 class="mt-5">Make a Reservation</h1>
+      <p><strong>Reservation Details</strong></p>
+      <p>Room: {{$reservation.Room.RoomName}}</p>
+      <p>Arrival: {{index .StringMap "start-date" }}</p>
+      <p>Departure: {{index .StringMap "end-date" }}</p>
       <form action="/book" method="POST" class="reservation-form needs-validation" novalidate>
-        <div class="form-group mt-5 mb-3">
+        <div class="form-group mt-3 mb-3">
           <input type="hidden" name="csrf_token" value={{.CSRFToken}}>
+          <input type="hidden" name="start-date" value="{{index .StringMap "start-date"}}">
+          <input type="hidden" name="end-date" value="{{index .StringMap "end-date"}}">
+          <input type="hidden" name="room-id" value="{{$reservation.RoomID}}">
           <label for="first-name">First Name:</label>
           {{ with .Form.Errors.Get "first-name" }}
             <label class="text-danger">{{.}}</label>

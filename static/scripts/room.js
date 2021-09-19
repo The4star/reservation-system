@@ -1,5 +1,6 @@
-import { notification } from './helpers.js'
+import { notification, modal, customModal } from './helpers.js'
 import { datePickerModal } from './helpers.js'
+const checkAvailabilityButton = document.querySelector('#check-availability')
 const html = `
     <form action="" method="GET" class="needs-validation" novalidate>
           <div class="row" id="reservation-dates-modal">
@@ -25,12 +26,29 @@ const openModal = () => {
     html,
     title: "Choose your dates",
     callback: async (result) => {
-      const roomType = document.querySelector('#room-type').innerHTML
-      result.roomType = roomType
+      const roomType = document.querySelector('#room-type')
+      const roomID = roomType.dataset.roomid
+      const roomName = roomType.innerHTML
+      result.roomID = roomID
       try {
         const response = await axios.post("/room-availability", result)
         const data = response.data;
-        console.log(data)
+        if (data.ok) {
+          customModal({
+            title: `The ${roomName} is available`,
+            text: `Would you like to book the ${roomName}`,
+            icon: "success",
+            showConfirmationButton: false,
+            showCancelButton: true,
+            html: `
+              <p>
+                <a href="/book-room?id=${roomID}&sd=${result.startDate}&ed=${result.endDate}" class="btn btn-primary mt-1">Book Now</a>
+              </p>
+            `
+          })
+        } else {
+          modal("Room is not available", "Please try alternative dates", "error", "OK")
+        }
       } catch (error) {
         console.log(error);
       }
@@ -50,5 +68,4 @@ const openModal = () => {
   }, 200);
 }
 
-const checkAvailabilityButton = document.querySelector('#check-availability')
 checkAvailabilityButton.addEventListener('click', openModal)
