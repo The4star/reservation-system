@@ -31,6 +31,7 @@ func routes(app *config.AppConfig) http.Handler {
 	router.Get("/reservation-summary", handlers.Repo.ReservationSummary)
 
 	router.Get("/user/login", handlers.Repo.ShowLogin)
+	router.Post("/user/login", handlers.Repo.PostLogin)
 
 	noSurfGroup.Get("/availability", handlers.Repo.Availability)
 	noSurfGroup.Post("/availability", handlers.Repo.PostAvailability)

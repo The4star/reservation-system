@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/justinas/nosurf"
+	"github.com/the4star/reservation-system/internal/helpers"
 )
 
 // adds csrf protection to all POST requests.
@@ -21,4 +22,15 @@ func NoSurf(next http.Handler) http.Handler {
 // loads and saves the session on every request
 func SessionLoad(next http.Handler) http.Handler {
 	return session.LoadAndSave(next)
+}
+
+func Auth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !helpers.IsAuthenticated(r) {
+			session.Put(r.Context(), "error", "Must be authenticated to access")
+			http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }
