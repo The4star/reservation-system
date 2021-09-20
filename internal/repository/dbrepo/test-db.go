@@ -71,3 +71,12 @@ func (pr *testDBRepo) Authenticate(email, password string) (int, string, error) 
 	var hashedPassword string
 	return id, hashedPassword, nil
 }
+
+//GetAllReservations gets all reservations from db.
+func (pr *testDBRepo) GetAllReservations() ([]models.Reservation, error) {
+
+	var allReservations []models.Reservation
+
+	return allReservations, nil
+
+}
