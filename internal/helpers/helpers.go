@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"runtime/debug"
+	"time"
 
 	"github.com/the4star/reservation-system/internal/config"
 )
@@ -28,4 +29,9 @@ func ServerError(w http.ResponseWriter, err error) {
 
 func IsAuthenticated(r *http.Request) bool {
 	return app.Session.Exists(r.Context(), "user_id")
+}
+
+//NiceDate returns date in nice format.
+func NiceDate(t time.Time) string {
+	return t.Format("02-01-2006")
 }

@@ -74,9 +74,18 @@ func (pr *testDBRepo) Authenticate(email, password string) (int, string, error) 
 
 //GetAllReservations gets all reservations from db.
 func (pr *testDBRepo) GetAllReservations() ([]models.Reservation, error) {
-
 	var allReservations []models.Reservation
-
 	return allReservations, nil
+}
 
+//GetAllNewReservations gets all new reservations from db.
+func (pr *testDBRepo) GetAllNewReservations() ([]models.Reservation, error) {
+	var allReservations []models.Reservation
+	return allReservations, nil
+}
+
+// GetReservationByID returns one reservation from db
+func (pr *testDBRepo) GetReservationByID(id int) (models.Reservation, error) {
+	var reservation models.Reservation
+	return reservation, nil
 }

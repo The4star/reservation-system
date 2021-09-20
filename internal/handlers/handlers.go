@@ -12,6 +12,7 @@ import (
 	"github.com/the4star/reservation-system/internal/config"
 	"github.com/the4star/reservation-system/internal/driver"
 	"github.com/the4star/reservation-system/internal/forms"
+	"github.com/the4star/reservation-system/internal/helpers"
 	"github.com/the4star/reservation-system/internal/models"
 	"github.com/the4star/reservation-system/internal/render"
 	"github.com/the4star/reservation-system/internal/repository"
@@ -353,13 +354,22 @@ func (m *Repository) PostBook(w http.ResponseWriter, r *http.Request) {
 		<p><strong>Reservation Confirmed</strong></p>
 		<p>Dear %s,<p>
 		<p>This is to confirm your reservation for the %s from %s to %s.</p>
-	`, reservation.FirstName, reservation.Room.RoomName, reservation.StartDate, reservation.EndDate)
+	`,
+		reservation.FirstName,
+		reservation.Room.RoomName,
+		helpers.NiceDate(reservation.StartDate),
+		helpers.NiceDate(reservation.EndDate),
+	)
 
 	hotelMessage := fmt.Sprintf(`
 		<p><strong>Reservation Confirmed</strong></p>
 		<p>Dear Owner,</p>
 		<p>This is to confirm a new reservation in the %s from %s to %s.</p>
-	`, reservation.Room.RoomName, reservation.StartDate, reservation.EndDate)
+	`,
+		reservation.Room.RoomName,
+		helpers.NiceDate(reservation.StartDate),
+		helpers.NiceDate(reservation.EndDate),
+	)
 
 	sendEmail(
 		m.App,
@@ -399,8 +409,8 @@ func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) 
 	}
 
 	stringMap := make(map[string]string)
-	stringMap["start-date"] = reservation.StartDate.Format("2006-01-02")
-	stringMap["end-date"] = reservation.EndDate.Format("2006-01-02")
+	stringMap["start-date"] = helpers.NiceDate(reservation.StartDate)
+	stringMap["end-date"] = helpers.NiceDate(reservation.EndDate)
 
 	m.App.Session.Remove(r.Context(), "reservation")
 	data := make(map[string]interface{})
@@ -472,12 +482,67 @@ func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 
 // AdminNewReservations shows the admin new reservations page.
 func (m *Repository) AdminNewReservations(w http.ResponseWriter, r *http.Request) {
-	render.Template(w, r, "admin-new-reservations.page.tmpl", &models.TemplateData{})
+	reservations, err := m.DB.GetAllNewReservations()
+	if err != nil {
+		m.App.ErrorLog.Println(err)
+		m.App.Session.Put(r.Context(), "error", "Error getting all new reservations")
+		http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
+		return
+	}
+
+	data := make(map[string]interface{})
+	data["reservations"] = reservations
+	render.Template(w, r, "admin-new-reservations.page.tmpl", &models.TemplateData{
+		Data: data,
+	})
 }
 
 // AdminAllReservations shows the admin all reservations page.
 func (m *Repository) AdminAllReservations(w http.ResponseWriter, r *http.Request) {
-	render.Template(w, r, "admin-all-reservations.page.tmpl", &models.TemplateData{})
+	reservations, err := m.DB.GetAllReservations()
+	if err != nil {
+		m.App.ErrorLog.Println(err)
+		m.App.Session.Put(r.Context(), "error", "Error getting all reservations")
+		http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
+		return
+	}
+
+	data := make(map[string]interface{})
+	data["reservations"] = reservations
+	render.Template(w, r, "admin-all-reservations.page.tmpl", &models.TemplateData{
+		Data: data,
+	})
+}
+
+// AdminShowReservation shows a single reservation
+func (m *Repository) AdminShowReservation(w http.ResponseWriter, r *http.Request) {
+	splitURI := strings.Split(r.URL.Path, "/")
+	id, err := strconv.Atoi(splitURI[4])
+	if err != nil {
+		m.App.ErrorLog.Println(err)
+		m.App.Session.Put(r.Context(), "error", "Error getting reservation")
+		http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
+	}
+
+	src := splitURI[3]
+	stringMap := make(map[string]string)
+	stringMap["src"] = src
+
+	res, err := m.DB.GetReservationByID(id)
+	if err != nil {
+		m.App.ErrorLog.Println(err)
+		m.App.Session.Put(r.Context(), "error", "Error getting reservation")
+		http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
+	}
+
+	data := make(map[string]interface{})
+	data["reservation"] = res
+
+	render.Template(w, r, "admin-reservations-show.page.tmpl", &models.TemplateData{
+		Data:      data,
+		StringMap: stringMap,
+		Form:      forms.New(nil),
+	})
 }
 
 // AdminReservationsCalendar shows the admin reservations calendar page.

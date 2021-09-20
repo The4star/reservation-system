@@ -10,6 +10,7 @@
         <!-- plugins:css -->
         <link rel="stylesheet" href="/static/admin/vendors/ti-icons/css/themify-icons.css">
         <link rel="stylesheet" href="/static/admin/vendors/base/vendor.bundle.base.css">
+        <link rel="stylesheet" type="text/css" href="https://unpkg.com/notie/dist/notie.min.css">
         <!-- endinject -->
         <!-- plugin css for this page -->
         <!-- End plugin css for this page -->
@@ -17,7 +18,15 @@
         <link rel="stylesheet" href="/static/admin/css/style.css">
         <!-- endinject -->
         <!-- <link rel="shortcut icon" href="/static/admin/images/favicon.png"/> -->
+        <style>
+            .content-wrapper {
+                background: white;
+            }
 
+            label {
+                font-weight: bold;
+            }
+        </style>
         {{block "css" . }}
 
         {{end}}
@@ -139,10 +148,49 @@
     <script src="/static/admin/js/hoverable-collapse.js"></script>
     <script src="/static/admin/js/template.js"></script>
     <script src="/static/admin/js/todolist.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- endinject -->
     <!-- Custom js for this page-->
     <script src="/static/admin/js/dashboard.js"></script>
     <!-- End custom js for this page-->
+
+    <script>
+        const toast = (options) => {
+            const {
+                title = "",
+                icon = "success",
+                position = "center-end"
+            } = options
+
+            const Toast = Swal.mixin({
+                toast: true,
+                title,
+                icon,
+                position,
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire()
+        }
+        {{with .Error }}
+          toast({title: "{{.}}", icon: "error"})
+        {{end}}
+    
+        {{with .Flash }}
+            toast({title: "{{.}}"})
+        {{end}}
+        
+        {{with .Warning }}
+            toast({title: "{{.}}", icon: "warning"})
+        {{end}}
+    
+    </script>
 
     {{block "js" . }}
 

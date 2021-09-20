@@ -11,10 +11,13 @@ import (
 
 	"github.com/justinas/nosurf"
 	"github.com/the4star/reservation-system/internal/config"
+	"github.com/the4star/reservation-system/internal/helpers"
 	"github.com/the4star/reservation-system/internal/models"
 )
 
-var functions = template.FuncMap{}
+var functions = template.FuncMap{
+	"niceDate": helpers.NiceDate,
+}
 var app *config.AppConfig
 var pathToTemplates string = "./templates"
 
