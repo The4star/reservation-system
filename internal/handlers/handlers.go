@@ -445,11 +445,22 @@ func (m *Repository) PostLogin(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		m.App.ErrorLog.Println(err)
 		m.App.Session.Put(r.Context(), "error", "Invalid login details")
-		http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+		render.Template(w, r, "login.page.tmpl", &models.TemplateData{
+			Form: form,
+		})
 		return
 	}
 
 	m.App.Session.Put(r.Context(), "user_id", id)
 	m.App.Session.Put(r.Context(), "flash", "Logged in successfully")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// Logout logs a user out
+func (m *Repository) Logout(w http.ResponseWriter, r *http.Request) {
+	_ = m.App.Session.Destroy(r.Context())
+	_ = m.App.Session.RenewToken(r.Context())
+
+	m.App.Session.Put(r.Context(), "flash", "Successfully logged out")
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }
