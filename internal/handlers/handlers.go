@@ -453,7 +453,7 @@ func (m *Repository) PostLogin(w http.ResponseWriter, r *http.Request) {
 
 	m.App.Session.Put(r.Context(), "user_id", id)
 	m.App.Session.Put(r.Context(), "flash", "Logged in successfully")
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
 }
 
 // Logout logs a user out
@@ -463,4 +463,9 @@ func (m *Repository) Logout(w http.ResponseWriter, r *http.Request) {
 
 	m.App.Session.Put(r.Context(), "flash", "Successfully logged out")
 	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+}
+
+// AdminDashboard shows the admin dashboard.
+func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
+	render.Template(w, r, "admin-dashboard.page.tmpl", &models.TemplateData{})
 }
