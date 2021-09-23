@@ -45,6 +45,7 @@ func routes(app *config.AppConfig) http.Handler {
 	protectedRouteGroup.Get("/admin/reservations-all", handlers.Repo.AdminAllReservations)
 	protectedRouteGroup.Get("/admin/reservations-calendar", handlers.Repo.AdminReservationsCalendar)
 	protectedRouteGroup.Get("/admin/reservations/{src}/{id}", handlers.Repo.AdminShowReservation)
+	protectedRouteGroup.Post("/admin/reservations/{src}/{id}", handlers.Repo.AdminPostUpdateReservation)
 
 	//availability
 	noSurfGroup.Get("/availability", handlers.Repo.Availability)

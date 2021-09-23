@@ -13,10 +13,15 @@ type DatabaseRepo interface {
 	SearchAvailabilityByDatesByRoomID(roomID int, startDate, endDate time.Time) (bool, error)
 	SearchAvailabilityForAllRooms(startDate, endDate time.Time) ([]models.Room, error)
 	GetRoomByID(id int) (models.Room, error)
+
 	GetUserByID(id int) (models.User, error)
 	UpdateUser(u models.User) error
 	Authenticate(email, password string) (int, string, error)
+
 	GetAllReservations() ([]models.Reservation, error)
 	GetAllNewReservations() ([]models.Reservation, error)
 	GetReservationByID(id int) (models.Reservation, error)
+	UpdateReservation(r models.Reservation) error
+	DeleteReservation(id int) error
+	UpdateProcessedForReservation(id int, processed bool) error
 }

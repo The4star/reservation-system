@@ -545,6 +545,64 @@ func (m *Repository) AdminShowReservation(w http.ResponseWriter, r *http.Request
 	})
 }
 
+// AdminPostUpdateReservation updates a single reservation
+func (m *Repository) AdminPostUpdateReservation(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		m.App.Session.Put(r.Context(), "error", "Error processing Form")
+		http.Redirect(w, r, r.URL.Path, http.StatusSeeOther)
+		return
+	}
+
+	splitURI := strings.Split(r.URL.Path, "/")
+	id, err := strconv.Atoi(splitURI[4])
+	if err != nil {
+		m.App.ErrorLog.Println(err)
+		m.App.Session.Put(r.Context(), "error", "Error getting reservation")
+		http.Redirect(w, r, r.URL.Path, http.StatusSeeOther)
+	}
+
+	src := splitURI[3]
+	stringMap := make(map[string]string)
+	stringMap["src"] = src
+
+	res, err := m.DB.GetReservationByID(id)
+	if err != nil {
+		m.App.ErrorLog.Println(err)
+		m.App.Session.Put(r.Context(), "error", "Error getting reservation")
+		http.Redirect(w, r, r.URL.Path, http.StatusSeeOther)
+	}
+
+	form := forms.New(r.PostForm)
+	form.Required("first-name", "last-name", "email", "phone")
+	form.IsEmail("email")
+	if !form.Valid() {
+		data := make(map[string]interface{})
+		data["reservation"] = res
+		render.Template(w, r, "admin-reservations-show.page.tmpl", &models.TemplateData{
+			Data:      data,
+			StringMap: stringMap,
+			Form:      form,
+		})
+		return
+	}
+
+	res.FirstName = r.Form.Get("first-name")
+	res.LastName = r.Form.Get("last-name")
+	res.Email = r.Form.Get("email")
+	res.Phone = r.Form.Get("phone")
+
+	err = m.DB.UpdateReservation(res)
+	if err != nil {
+		m.App.ErrorLog.Println(err)
+		m.App.Session.Put(r.Context(), "error", "Error updating reservation")
+		http.Redirect(w, r, r.URL.Path, http.StatusSeeOther)
+	}
+
+	m.App.Session.Put(r.Context(), "flash", fmt.Sprintf("Changes saved for reservation #%d", id))
+	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+}
+
 // AdminReservationsCalendar shows the admin reservations calendar page.
 func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "admin-reservations-calendar.page.tmpl", &models.TemplateData{})

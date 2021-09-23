@@ -91,13 +91,13 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 		if err != nil {
 			return myCache, err
 		}
-		matches, err := filepath.Glob(fmt.Sprintf("%s/*.layout.tmpl", pathToTemplates))
+		matches, err := filepath.Glob(fmt.Sprintf("%s/layouts/*.layout.tmpl", pathToTemplates))
 		if err != nil {
 			return myCache, err
 		}
 
 		if len(matches) > 0 {
-			ts, err = ts.ParseGlob(fmt.Sprintf("%s/*.layout.tmpl", pathToTemplates))
+			ts, err = ts.ParseGlob(fmt.Sprintf("%s/layouts/*.layout.tmpl", pathToTemplates))
 			if err != nil {
 				return myCache, err
 			}
