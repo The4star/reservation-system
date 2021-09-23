@@ -80,8 +80,33 @@
             value="{{$res.Phone}}"
           >
         </div>
-        <button type="submit" class="btn btn-primary">Save</button>
-        <a href="/admin/reservations-{{$src}}" class="btn btn-warning">Cancel</a>
+        <div class="float-left">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <a href="/admin/reservations-{{$src}}" class="btn btn-warning">Cancel</a>
+          <button 
+            id="process"
+            class="btn btn-primary" 
+            role="button" 
+            type="button" 
+            data-id="{{$res.ID}}"
+            data-src="{{$src}}" 
+          >
+            Mark as processed
+          </button>
+        </div>
+        <div class="float-right">
+          <button 
+            id="delete"
+            class="btn btn-danger" 
+            role="button" 
+            type="button" 
+            data-src="{{$src}}" 
+            data-id="{{$res.ID}}"
+          >
+            Delete
+          </button>
+        </div>
+        <div class="clearfix"></div>
       </form>
     </div>
 {{end}}
