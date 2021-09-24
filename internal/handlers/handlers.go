@@ -544,9 +544,14 @@ func (m *Repository) AdminShowReservation(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	year := r.URL.Query().Get("y")
+	month := r.URL.Query().Get("m")
+
 	src := splitURI[3]
 	stringMap := make(map[string]string)
 	stringMap["src"] = src
+	stringMap["month"] = month
+	stringMap["year"] = year
 
 	res, err := m.DB.GetReservationByID(id)
 	if err != nil {
@@ -624,8 +629,17 @@ func (m *Repository) AdminPostUpdateReservation(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	month := r.Form.Get("month")
+	year := r.Form.Get("year")
+
 	m.App.Session.Put(r.Context(), "flash", fmt.Sprintf("Changes saved for reservation #%d", id))
-	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+
+	if year == "" {
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+	} else {
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%s&m=%s", year, month), http.StatusSeeOther)
+	}
+
 }
 
 // AdminProcessReservation updates a reservation to processed.
@@ -648,8 +662,16 @@ func (m *Repository) AdminProcessReservation(w http.ResponseWriter, r *http.Requ
 		http.Redirect(w, r, fmt.Sprintf("/admin/reservations/%s/%d", src, id), http.StatusSeeOther)
 		return
 	}
+
 	m.App.Session.Put(r.Context(), "flash", "Reservation Marked as processed")
-	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+
+	if src == "cal" {
+		year := r.URL.Query().Get("y")
+		month := r.URL.Query().Get("m")
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%s&m=%s", year, month), http.StatusSeeOther)
+	} else {
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+	}
 }
 
 // AdminDeleteReservation deletes a reservation.
@@ -673,7 +695,14 @@ func (m *Repository) AdminDeleteReservation(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	m.App.Session.Put(r.Context(), "flash", "Reservation Deleted")
-	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+
+	if src == "cal" {
+		year := r.URL.Query().Get("y")
+		month := r.URL.Query().Get("m")
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%s&m=%s", year, month), http.StatusSeeOther)
+	} else {
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+	}
 }
 
 // AdminReservationsCalendar shows the admin reservations calendar page.

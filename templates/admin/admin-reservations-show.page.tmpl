@@ -23,6 +23,8 @@
       <form action="/admin/reservations/{{$src}}/{{$res.ID}}" method="POST" class="reservation-form needs-validation" novalidate>
         <div class="form-group mt-3 mb-3">
           <input type="hidden" name="csrf_token" value={{.CSRFToken}}>
+          <input type="hidden" name="month" value={{index .StringMap "month"}}>
+          <input type="hidden" name="year" value={{index .StringMap "year"}} >
           <label for="first-name">First Name:</label>
           {{ with .Form.Errors.Get "first-name" }}
             <label class="text-danger">{{.}}</label>
@@ -87,6 +89,7 @@
           {{else}}
             <a href="/admin/reservations-{{$src}}" class="btn btn-warning">Cancel</a>
           {{end}}
+          {{if eq $res.Processed false}}
           <button 
             id="process"
             class="btn btn-primary" 
@@ -94,9 +97,12 @@
             type="button" 
             data-id="{{$res.ID}}"
             data-src="{{$src}}" 
+            data-month="{{index .StringMap "month"}}"
+            data-year="{{index .StringMap "year"}}"
           >
             Mark as processed
           </button>
+          {{end}}
         </div>
         <div class="float-right">
           <button 
@@ -106,6 +112,8 @@
             type="button" 
             data-src="{{$src}}" 
             data-id="{{$res.ID}}"
+            data-month="{{index .StringMap "month"}}"
+            data-year="{{index .StringMap "year"}}"
           >
             Delete
           </button>

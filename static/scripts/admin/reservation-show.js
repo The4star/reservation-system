@@ -3,7 +3,7 @@ const form = document.querySelector('.needs-validation');
 const processButton = document.querySelector("#process");
 const deleteButton = document.querySelector("#delete")
 const processRes = () => {
-  const { id, src } = processButton.dataset
+  const { id, src, year, month } = processButton.dataset
 
   customModal({
     title: `Are you sure?`,
@@ -12,14 +12,14 @@ const processRes = () => {
     showCancelButton: true,
     html: `
       <p>
-        <a href="/admin/process/${src}/${id}" class="btn btn-primary mt-1">OK</a>
+        <a href="/admin/reservations/${src}/${id}/process?y=${year}&m=${month}" class="btn btn-primary mt-1">OK</a>
       </p>
     `
   })
 }
 
 const deleteRes = () => {
-  const { id, src } = deleteButton.dataset
+  const { id, src, year, month } = deleteButton.dataset
   customModal({
     title: `Are you sure?`,
     icon: "warning",
@@ -27,7 +27,7 @@ const deleteRes = () => {
     showCancelButton: true,
     html: `
       <p>
-        <a href="/admin/delete/${src}/${id}" class="btn btn-primary mt-1">OK</a>
+        <a href="/admin/reservations/${src}/${id}/delete?y=${year}&m=${month}" class="btn btn-primary mt-1">OK</a>
       </p>
     `
   })
@@ -46,5 +46,7 @@ form.addEventListener('submit', function (event) {
   form.classList.add('was-validated')
 }, false)
 
-processButton.addEventListener("click", processRes);
+if (processButton) {
+  processButton.addEventListener("click", processRes);
+}
 deleteButton.addEventListener("click", deleteRes)

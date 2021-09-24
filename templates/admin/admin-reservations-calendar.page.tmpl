@@ -59,7 +59,7 @@
               {{range $index := iterate $daysInMonth}}
                 <td class="text-center">
                   {{if gt (index $reservations (printf "%s-%s-%d" $currentYear $currentMonth $index)) 0}}
-                      <a href="/admin/reservations/cal/{{index $reservations (printf "%s-%s-%d" $currentYear $currentMonth $index)}}">
+                      <a href="/admin/reservations/cal/{{index $reservations (printf "%s-%s-%d" $currentYear $currentMonth $index)}}/show?y={{$currentYear}}&m={{$currentMonth}}">
                           <span class="text-danger">R</span>
                       </a>
                   {{else}}
