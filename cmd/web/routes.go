@@ -44,6 +44,7 @@ func routes(app *config.AppConfig) http.Handler {
 	protectedRouteGroup.Get("/admin/reservations-new", handlers.Repo.AdminNewReservations)
 	protectedRouteGroup.Get("/admin/reservations-all", handlers.Repo.AdminAllReservations)
 	protectedRouteGroup.Get("/admin/reservations-calendar", handlers.Repo.AdminReservationsCalendar)
+	protectedRouteGroup.Post("/admin/reservations-calendar", handlers.Repo.AdminPostReservationsCalendar)
 	protectedRouteGroup.Get("/admin/reservations/{src}/{id}", handlers.Repo.AdminShowReservation)
 	protectedRouteGroup.Post("/admin/reservations/{src}/{id}", handlers.Repo.AdminPostUpdateReservation)
 	protectedRouteGroup.Get("/admin/process/{src}/{id}", handlers.Repo.AdminProcessReservation)

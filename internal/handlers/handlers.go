@@ -783,3 +783,34 @@ func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Re
 		IntMap:    intMap,
 	})
 }
+
+// AdminPostReservationsCalendar handles the updating of the reservations calendar
+func (m *Repository) AdminPostReservationsCalendar(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		m.App.ErrorLog.Println(err)
+		m.App.Session.Put(r.Context(), "error", "Error retrieving form information")
+		http.Redirect(w, r, "/admin/reservations-calendar", http.StatusTemporaryRedirect)
+		return
+	}
+
+	fmt.Println(r.PostForm)
+
+	year, err := strconv.Atoi(r.Form.Get("y"))
+	if err != nil {
+		m.App.ErrorLog.Println(err)
+		m.App.Session.Put(r.Context(), "error", "Error retrieving form information")
+		http.Redirect(w, r, "/admin/reservations-calendar", http.StatusTemporaryRedirect)
+		return
+	}
+	month, err := strconv.Atoi(r.Form.Get("m"))
+	if err != nil {
+		m.App.ErrorLog.Println(err)
+		m.App.Session.Put(r.Context(), "error", "Error retrieving form information")
+		http.Redirect(w, r, "/admin/reservations-calendar", http.StatusTemporaryRedirect)
+		return
+	}
+
+	m.App.Session.Put(r.Context(), "flash", "Changes saved")
+	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%d&m=%d", year, month), http.StatusSeeOther)
+}
