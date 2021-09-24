@@ -115,7 +115,7 @@ func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 
 	start := r.Form.Get("start-date")
 	end := r.Form.Get("end-date")
-	timeLayout := "2006-01-02"
+	timeLayout := "2006-01-2"
 	startDate, err := time.Parse(timeLayout, start)
 	if err != nil {
 		m.App.ErrorLog.Println(err)
@@ -181,7 +181,7 @@ func (m *Repository) PostRoomAvailability(w http.ResponseWriter, r *http.Request
 	fmt.Printf("%+v", jsonData)
 	w.Header().Set("Content-Type", "application/json")
 
-	timeLayout := "2006-01-02"
+	timeLayout := "2006-01-2"
 	startDate, err := time.Parse(timeLayout, jsonData.StartDate)
 	if err != nil {
 		m.App.ErrorLog.Println(err)
@@ -235,7 +235,7 @@ func (m *Repository) BookRoom(w http.ResponseWriter, r *http.Request) {
 	sd := r.URL.Query().Get("sd")
 	ed := r.URL.Query().Get("ed")
 
-	timeLayout := "2006-01-02"
+	timeLayout := "2006-01-2"
 	startDate, err := time.Parse(timeLayout, sd)
 	if err != nil {
 		m.App.ErrorLog.Println(err)
@@ -289,8 +289,8 @@ func (m *Repository) Book(w http.ResponseWriter, r *http.Request) {
 	m.App.Session.Put(r.Context(), "reservation", res)
 
 	stringMap := make(map[string]string)
-	stringMap["start-date"] = res.StartDate.Format("2006-01-02")
-	stringMap["end-date"] = res.EndDate.Format("2006-01-02")
+	stringMap["start-date"] = res.StartDate.Format("2006-01-2")
+	stringMap["end-date"] = res.EndDate.Format("2006-01-2")
 
 	data := make(map[string]interface{})
 	data["reservation"] = res
@@ -747,8 +747,8 @@ func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Re
 		blockMap := make(map[string]int)
 
 		for date := firstOfMonth; !date.After(lastOfMonth); date = date.AddDate(0, 0, 1) {
-			reservationMap[date.Format("2006-01-02")] = 0
-			blockMap[date.Format("2006-01-02")] = 0
+			reservationMap[date.Format("2006-01-2")] = 0
+			blockMap[date.Format("2006-01-2")] = 0
 		}
 
 		restrictions, err := m.DB.GetRestrictionsForRoomByDate(room.ID, firstOfMonth, lastOfMonth)
@@ -763,11 +763,11 @@ func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Re
 			if restriction.ReservationID > 0 {
 				// it's a reservation
 				for date := restriction.StartDate; !date.After(restriction.EndDate); date = date.AddDate(0, 0, 1) {
-					reservationMap[date.Format("2006-01-02")] = restriction.ReservationID
+					reservationMap[date.Format("2006-01-2")] = restriction.ReservationID
 				}
 			} else {
 				// it's a block
-				blockMap[restriction.StartDate.Format("2006-01-02")] = restriction.ID
+				blockMap[restriction.StartDate.Format("2006-01-2")] = restriction.ID
 			}
 		}
 
@@ -809,6 +809,65 @@ func (m *Repository) AdminPostReservationsCalendar(w http.ResponseWriter, r *htt
 		m.App.Session.Put(r.Context(), "error", "Error retrieving form information")
 		http.Redirect(w, r, "/admin/reservations-calendar", http.StatusTemporaryRedirect)
 		return
+	}
+
+	//process blocks
+	rooms, err := m.DB.GetAllRooms()
+	if err != nil {
+		m.App.ErrorLog.Println(err)
+		m.App.Session.Put(r.Context(), "error", "Error retrieving form information")
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%d&m=%d", year, month), http.StatusTemporaryRedirect)
+		return
+	}
+
+	form := forms.New(r.PostForm)
+
+	// remove blocks
+	for _, room := range rooms {
+		currentMap := m.App.Session.Get(r.Context(), fmt.Sprintf("block-map-%d", room.ID)).(map[string]int)
+		for key, value := range currentMap {
+			if val, ok := currentMap[key]; ok {
+				if val > 0 {
+					if !form.Has(fmt.Sprintf("remove-block-%d-%s", room.ID, key)) {
+						err := m.DB.DeleteBlockByID(value)
+						if err != nil {
+							m.App.ErrorLog.Println(err)
+							m.App.Session.Put(r.Context(), "error", "Error deleting block")
+							http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%d&m=%d", year, month), http.StatusTemporaryRedirect)
+							return
+						}
+					}
+				}
+			}
+		}
+	}
+
+	for name := range r.PostForm {
+		if strings.HasPrefix(name, "add-block") {
+			splitName := strings.Split(name, "-")
+			roomID, err := strconv.Atoi(splitName[2])
+			if err != nil {
+				m.App.ErrorLog.Println(err)
+				m.App.Session.Put(r.Context(), "error", "Error parsing room id")
+				http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%d&m=%d", year, month), http.StatusTemporaryRedirect)
+				return
+			}
+			timeLayout := "2006-01-2"
+			date, err := time.Parse(timeLayout, strings.Join(splitName[3:], "-"))
+			if err != nil {
+				m.App.ErrorLog.Println(err)
+				m.App.Session.Put(r.Context(), "error", "Error parsing time")
+				http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%d&m=%d", year, month), http.StatusTemporaryRedirect)
+				return
+			}
+			err = m.DB.InsertBlockForRoom(roomID, date)
+			if err != nil {
+				m.App.ErrorLog.Println(err)
+				m.App.Session.Put(r.Context(), "error", "Error inserting block")
+				http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%d&m=%d", year, month), http.StatusTemporaryRedirect)
+				return
+			}
+		}
 	}
 
 	m.App.Session.Put(r.Context(), "flash", "Changes saved")

@@ -116,6 +116,52 @@ func (pr *postgresDBRepo) InsertRoomRestriction(rr models.RoomRestriction) error
 	return nil
 }
 
+// InsertBlockForRoom blocks out a room for the admin.
+func (pr *postgresDBRepo) InsertBlockForRoom(id int, startDate time.Time) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `
+		insert into room_restrictions (start_date, end_date, room_id, restriction_id,
+		created_at, updated_at) values($1, $2, $3, $4, $5, $6)	
+	`
+
+	_, err := pr.DB.ExecContext(
+		ctx,
+		query,
+		startDate,
+		startDate.AddDate(0, 0, 1),
+		id,
+		2,
+		time.Now(),
+		time.Now(),
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// DeleteBlockByID deletes a room restriction by id.
+func (pr *postgresDBRepo) DeleteBlockByID(id int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `
+		delete from room_restrictions where id = $1	
+	`
+
+	_, err := pr.DB.ExecContext(ctx, query, id)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // SearchAvailabilityByDatesByRoomID returns true if availability exists and false if no availability exists
 func (pr *postgresDBRepo) SearchAvailabilityByDatesByRoomID(roomID int, startDate, endDate time.Time) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)

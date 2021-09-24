@@ -32,6 +32,16 @@ func (pr *testDBRepo) InsertRoomRestriction(rr models.RoomRestriction) error {
 	return nil
 }
 
+// InsertBlockForRoom blocks out a room for the admin.
+func (pr *testDBRepo) InsertBlockForRoom(id int, startDate time.Time) error {
+	return nil
+}
+
+// DeleteBlockByID deletes a room restriction by id.
+func (pr *testDBRepo) DeleteBlockByID(id int) error {
+	return nil
+}
+
 // SearchAvailabilityByDatesByRoomID returns true if availability exists and false if no availability exists
 func (pr *testDBRepo) SearchAvailabilityByDatesByRoomID(roomID int, startDate, endDate time.Time) (bool, error) {
 	return false, nil
