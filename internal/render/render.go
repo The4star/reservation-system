@@ -16,7 +16,9 @@ import (
 )
 
 var functions = template.FuncMap{
-	"niceDate": helpers.NiceDate,
+	"niceDate":   helpers.NiceDate,
+	"formatDate": helpers.FormatDate,
+	"iterate":    helpers.Iterate,
 }
 var app *config.AppConfig
 var pathToTemplates string = "./templates"

@@ -635,7 +635,7 @@ func (m *Repository) AdminProcessReservation(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		m.App.ErrorLog.Println(err)
 		m.App.Session.Put(r.Context(), "error", "Error getting reservation")
-		http.Redirect(w, r, "admin/dashboard", http.StatusSeeOther)
+		http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
 		return
 	}
 
@@ -645,7 +645,7 @@ func (m *Repository) AdminProcessReservation(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		m.App.ErrorLog.Println(err)
 		m.App.Session.Put(r.Context(), "error", "Error getting reservation")
-		http.Redirect(w, r, fmt.Sprintf("admin/reservations/%s/%d", src, id), http.StatusSeeOther)
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations/%s/%d", src, id), http.StatusSeeOther)
 		return
 	}
 	m.App.Session.Put(r.Context(), "flash", "Reservation Marked as processed")
@@ -659,7 +659,7 @@ func (m *Repository) AdminDeleteReservation(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		m.App.ErrorLog.Println(err)
 		m.App.Session.Put(r.Context(), "error", "Error getting reservation")
-		http.Redirect(w, r, "admin/dashboard", http.StatusSeeOther)
+		http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
 		return
 	}
 
@@ -669,7 +669,7 @@ func (m *Repository) AdminDeleteReservation(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		m.App.ErrorLog.Println(err)
 		m.App.Session.Put(r.Context(), "error", "Error getting reservation")
-		http.Redirect(w, r, fmt.Sprintf("admin/reservations/%s/%d", src, id), http.StatusSeeOther)
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations/%s/%d", src, id), http.StatusSeeOther)
 		return
 	}
 	m.App.Session.Put(r.Context(), "flash", "Reservation Deleted")
@@ -678,5 +678,74 @@ func (m *Repository) AdminDeleteReservation(w http.ResponseWriter, r *http.Reque
 
 // AdminReservationsCalendar shows the admin reservations calendar page.
 func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Request) {
-	render.Template(w, r, "admin-reservations-calendar.page.tmpl", &models.TemplateData{})
+
+	now := time.Now()
+
+	year := r.URL.Query().Get("y")
+	month := r.URL.Query().Get("m")
+
+	if year != "" && month != "" {
+		year, err := strconv.Atoi(year)
+		if err != nil {
+			m.App.ErrorLog.Println(err)
+			m.App.Session.Put(r.Context(), "error", "Error processing params, make sure you use the correct format")
+			http.Redirect(w, r, "admin/reservations-calendar", http.StatusSeeOther)
+			return
+		}
+		month, err := strconv.Atoi(month)
+		if err != nil {
+			m.App.ErrorLog.Println(err)
+			m.App.Session.Put(r.Context(), "error", "Error processing params, make sure you use the correct format")
+			http.Redirect(w, r, "/admin/reservations-calendar", http.StatusSeeOther)
+			return
+		}
+
+		now = time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+	}
+
+	next := now.AddDate(0, 1, 0)
+	last := now.AddDate(0, -1, 0)
+
+	nextMonth := next.Format("01")
+	nextMonthYear := next.Format("2006")
+	lastMonth := last.Format("01")
+	lastMonthYear := last.Format("2006")
+
+	stringMap := map[string]string{
+		"next-month":      nextMonth,
+		"next-month-year": nextMonthYear,
+		"last-month":      lastMonth,
+		"last-month-year": lastMonthYear,
+		"this-month":      now.Format("01"),
+		"this-month-year": now.Format("2006"),
+	}
+
+	// get the first and last days of the month
+	currentYear, currentMonth, _ := now.Date()
+	currentLocation := now.Location()
+	firstOfMonth := time.Date(currentYear, currentMonth, 1, 0, 0, 0, 0, currentLocation)
+	lastOfMonth := firstOfMonth.AddDate(0, 1, -1)
+
+	intMap := map[string]int{
+		"days-in-month": lastOfMonth.Day(),
+	}
+
+	rooms, err := m.DB.GetAllRooms()
+	if err != nil {
+		m.App.ErrorLog.Println(err)
+		m.App.Session.Put(r.Context(), "error", "Error retrieving rooms")
+		http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
+		return
+	}
+
+	data := map[string]interface{}{
+		"now":   now,
+		"rooms": rooms,
+	}
+
+	render.Template(w, r, "admin-reservations-calendar.page.tmpl", &models.TemplateData{
+		Data:      data,
+		StringMap: stringMap,
+		IntMap:    intMap,
+	})
 }

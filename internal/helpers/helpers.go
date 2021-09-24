@@ -35,3 +35,18 @@ func IsAuthenticated(r *http.Request) bool {
 func NiceDate(t time.Time) string {
 	return t.Format("02-01-2006")
 }
+
+// FormatDate formats a date in the specified format(f)
+func FormatDate(t time.Time, f string) string {
+	return t.Format(f)
+}
+
+// returns a slice of integers starting at 1 and going to count.
+func Iterate(count int) []int {
+	var i int
+	var items []int
+	for i = 0; i < count; i++ {
+		items = append(items, i+1)
+	}
+	return items
+}

@@ -133,7 +133,44 @@ func (pr *postgresDBRepo) SearchAvailabilityForAllRooms(startDate, endDate time.
 	return availableRooms, nil
 }
 
-// GetRoomByID gets a room by idß
+// GetAllRooms gets all rooms from db
+func (pr *postgresDBRepo) GetAllRooms() ([]models.Room, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var rooms []models.Room
+
+	query := `select id, room_name, created_at, updated_at from rooms`
+
+	rows, err := pr.DB.QueryContext(ctx, query)
+	if err != nil {
+		return rooms, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var room models.Room
+		err := rows.Scan(
+			&room.ID,
+			&room.RoomName,
+			&room.CreatedAt,
+			&room.UpdatedAt,
+		)
+
+		if err != nil {
+			return rooms, err
+		}
+
+		rooms = append(rooms, room)
+	}
+
+	if err = rows.Err(); err != nil {
+		return rooms, err
+	}
+
+	return rooms, nil
+}
+
+// GetRoomByID gets a room by id
 func (pr *postgresDBRepo) GetRoomByID(id int) (models.Room, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -256,6 +293,7 @@ func (pr *postgresDBRepo) GetAllReservations() ([]models.Reservation, error) {
 		return allReservations, err
 	}
 	defer rows.Close()
+
 	for rows.Next() {
 		var res models.Reservation
 		err := rows.Scan(
@@ -306,6 +344,7 @@ func (pr *postgresDBRepo) GetAllNewReservations() ([]models.Reservation, error) 
 		return allReservations, err
 	}
 	defer rows.Close()
+
 	for rows.Next() {
 		var res models.Reservation
 		err := rows.Scan(
