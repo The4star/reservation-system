@@ -19,6 +19,11 @@ func (pr *testDBRepo) InsertReservation(res models.Reservation) (int, error) {
 	return 1, nil
 }
 
+func (pr *testDBRepo) GetRestrictionsForRoomByDate(roomId int, start, end time.Time) ([]models.RoomRestriction, error) {
+	var restrictions []models.RoomRestriction
+	return restrictions, nil
+}
+
 //InsertRoomRestriction inserts a room into the database
 func (pr *testDBRepo) InsertRoomRestriction(rr models.RoomRestriction) error {
 	if rr.RoomID == 1000 {

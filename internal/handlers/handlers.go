@@ -680,7 +680,6 @@ func (m *Repository) AdminDeleteReservation(w http.ResponseWriter, r *http.Reque
 func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Request) {
 
 	now := time.Now()
-
 	year := r.URL.Query().Get("y")
 	month := r.URL.Query().Get("m")
 
@@ -741,6 +740,41 @@ func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Re
 	data := map[string]interface{}{
 		"now":   now,
 		"rooms": rooms,
+	}
+
+	for _, room := range rooms {
+		reservationMap := make(map[string]int)
+		blockMap := make(map[string]int)
+
+		for date := firstOfMonth; !date.After(lastOfMonth); date = date.AddDate(0, 0, 1) {
+			reservationMap[date.Format("2006-01-02")] = 0
+			blockMap[date.Format("2006-01-02")] = 0
+		}
+
+		restrictions, err := m.DB.GetRestrictionsForRoomByDate(room.ID, firstOfMonth, lastOfMonth)
+		if err != nil {
+			m.App.ErrorLog.Println(err)
+			m.App.Session.Put(r.Context(), "error", "Error retrieving restrictions")
+			http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
+			return
+		}
+
+		for _, restriction := range restrictions {
+			if restriction.ReservationID > 0 {
+				// it's a reservation
+				for date := restriction.StartDate; !date.After(restriction.EndDate); date = date.AddDate(0, 0, 1) {
+					reservationMap[date.Format("2006-01-02")] = restriction.ReservationID
+				}
+			} else {
+				// it's a block
+				blockMap[restriction.StartDate.Format("2006-01-02")] = restriction.RestrictionID
+			}
+		}
+
+		data[fmt.Sprintf("reservation-map-%d", room.ID)] = reservationMap
+		data[fmt.Sprintf("block-map-%d", room.ID)] = blockMap
+
+		m.App.Session.Put(r.Context(), fmt.Sprintf("block-map-%d", room.ID), blockMap)
 	}
 
 	render.Template(w, r, "admin-reservations-calendar.page.tmpl", &models.TemplateData{

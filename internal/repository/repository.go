@@ -9,6 +9,7 @@ import (
 type DatabaseRepo interface {
 	AllUsers() bool
 	InsertReservation(res models.Reservation) (int, error)
+	GetRestrictionsForRoomByDate(roomId int, start, end time.Time) ([]models.RoomRestriction, error)
 	InsertRoomRestriction(rr models.RoomRestriction) error
 	SearchAvailabilityByDatesByRoomID(roomID int, startDate, endDate time.Time) (bool, error)
 
