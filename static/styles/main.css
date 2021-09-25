@@ -1,3 +1,6 @@
+main {
+  min-height: 60vh;
+}
 .room-image {
   max-width: 50%;
 }
@@ -9,8 +12,12 @@
 footer {
   background-color: #163b65;
   margin-top: 25px;
-  height: 100px;
+  /* height: 200px; */
   padding: 25px;
+}
+
+.footer__right {
+  text-align: right !important;
 }
 
 footer p {

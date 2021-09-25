@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/css/datepicker-bs4.min.css">
   <link rel="stylesheet" type="text/css" href="https://unpkg.com/notie/dist/notie.min.css">
   <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
+  <link rel="shortcut icon" href="/static/images/favicon.ico"/>
   <title>4star on Regent</title>
 </head>
 
@@ -63,18 +64,22 @@
       </div>
     </div>
   </nav>
-  {{block "content" .}}
-  {{end}}
+  <main>
+    {{block "content" .}}
+    {{end}}
+  </main>
   <footer>
     <div class="row">
-      <div class="col">
-        <p>Left</p>
+      <div class="col-md-6">
+        <p><strong>4star on Regent</strong></p>
+        <p>123 fake street</p>
+        <p>fake suburb, fake state</p> 
+        <p>Australia, 1234</p>
+        <p>0412345678</p>
+        <a href="mailto:clintonforster@gmail.com">contact@4staronregent.com</a>
       </div>
-      <div class="col">
-        <p>Center</p>
-      </div>
-      <div class="col">
-        <p>Right</p>
+      <div class="col-md-6 footer__right">
+        <p>4 stars out of 4</p>
       </div>
     </div>
   </footer>
