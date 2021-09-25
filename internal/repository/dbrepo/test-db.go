@@ -89,6 +89,10 @@ func (pr *testDBRepo) UpdateUser(u models.User) error {
 func (pr *testDBRepo) Authenticate(email, password string) (int, string, error) {
 	var id int
 	var hashedPassword string
+	if email == "invalid@here.com" {
+		return id, hashedPassword, errors.New("invalid login")
+	}
+
 	return id, hashedPassword, nil
 }
 
@@ -107,6 +111,10 @@ func (pr *testDBRepo) GetAllNewReservations() ([]models.Reservation, error) {
 // GetReservationByID returns one reservation from db
 func (pr *testDBRepo) GetReservationByID(id int) (models.Reservation, error) {
 	var reservation models.Reservation
+
+	if id >= 1000 {
+		return reservation, errors.New("invalid")
+	}
 	return reservation, nil
 }
 
@@ -115,9 +123,15 @@ func (pr *testDBRepo) UpdateReservation(r models.Reservation) error {
 }
 
 func (pr *testDBRepo) DeleteReservation(id int) error {
+	if id >= 1000 {
+		return errors.New("invalid")
+	}
 	return nil
 }
 
 func (pr *testDBRepo) UpdateProcessedForReservation(id int, processed bool) error {
+	if id >= 1000 {
+		return errors.New("invalid")
+	}
 	return nil
 }
