@@ -8,7 +8,7 @@ A hotel reservations system.
  - Uses [nosurf](github.com/justinas/nosurf)
 
 
-## database setup
+## Database setup
 
 * create a database in postgresql e.g `create database reservation_system`
 * [install soda for migrations](https://gobuffalo.io/en/docs/db/toolbox/)
@@ -54,7 +54,7 @@ DB_SSL=false
 
 Email notifications are setup for bookings, [Mailhog](https://github.com/mailhog/MailHog) is good to use for testing. Simply install it and have the server running to view emails being sent. 
 
-## run the application and develop
+## Run the application and develop
 * start the application `./run.sh`
 
 * Add the flag `-production=true` to use the template cache instead of creating a template on each render.
