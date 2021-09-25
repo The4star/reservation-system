@@ -16,38 +16,6 @@ import (
 	"github.com/the4star/reservation-system/internal/models"
 )
 
-type postData struct {
-	key   string
-	value string
-}
-
-type test struct {
-	name               string
-	url                string
-	method             string
-	expectedStatusCode int
-}
-
-var getTests = []test{
-	{"home", "/", "GET", http.StatusOK},
-	{"about", "/about", "GET", http.StatusOK},
-	{"contact", "/contact", "GET", http.StatusOK},
-	{"availability", "/availability", "GET", http.StatusOK},
-	{"standard suite", "/rooms/standard-suite", "GET", http.StatusOK},
-	{"deluxe suite", "/rooms/deluxe-suite", "GET", http.StatusOK},
-	// {"reservation summary", "/reservation-summary", "GET", []postData{}, http.StatusOK, "none"},
-	// {"availabilty", "/availability", "GET", []postData{}, http.StatusOK, "none"},
-	// {"check availability", "/availability", "POST", []postData{
-	// 	{key: "start-date", value: "2022-01-01"},
-	// 	{key: "end-date", value: "2022-01-02"},
-	// }, http.StatusOK, "form"},
-	// {"check room availability", "/room-availability", "POST", []postData{
-	// 	{key: "startDate", value: "2022-01-01"},
-	// 	{key: "endDate", value: "2022-01-02"},
-	// 	{key: "roomID", value: "2"},
-	// }, http.StatusOK, "json"},
-}
-
 func TestGetHandlers(t *testing.T) {
 	routes := getRoutes()
 	testServer := httptest.NewTLSServer(routes)
@@ -55,10 +23,9 @@ func TestGetHandlers(t *testing.T) {
 
 	for _, test := range getTests {
 		// test get route
-		fmt.Println(test)
+		fmt.Println(test.name)
 		resp, err := testServer.Client().Get(testServer.URL + test.url)
 		if err != nil {
-			t.Log("Here")
 			t.Log(err)
 			t.Fatal(err)
 		}
@@ -487,7 +454,198 @@ func TestReservationSummary(t *testing.T) {
 	if rr.Code != http.StatusTemporaryRedirect {
 		t.Errorf("Post Book handler returned wrong response code, got %d wanted %d", rr.Code, http.StatusTemporaryRedirect)
 	}
+}
 
+func TestLogin(t *testing.T) {
+	for _, lt := range loginTests {
+		postedData := url.Values{}
+		postedData.Add("email", lt.email)
+		postedData.Add("password", "$Password123")
+
+		req, _ := http.NewRequest("POST", "/user/login", strings.NewReader(postedData.Encode()))
+		ctx := getCTX(req)
+		req = req.WithContext(ctx)
+
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		rr := httptest.NewRecorder()
+
+		handler := http.HandlerFunc(Repo.PostLogin)
+		handler.ServeHTTP(rr, req)
+
+		if rr.Code != lt.expectedStatusCode {
+			t.Errorf("failed %s: expected code %d, but got %d", lt.name, lt.expectedStatusCode, rr.Code)
+		}
+
+		if lt.expectedLocation != "" {
+			actualLocation, _ := rr.Result().Location()
+			if actualLocation.String() != lt.expectedLocation {
+				t.Errorf("failed %s: expected location %s but got location %s", lt.name, lt.expectedLocation, actualLocation)
+			}
+		}
+
+		if lt.expectedHTML != "" {
+			html := rr.Body.String()
+			if !strings.Contains(html, lt.expectedHTML) {
+				t.Errorf("failed %s: expected html %s but got %s", lt.name, lt.expectedHTML, html)
+			}
+		}
+	}
+}
+
+func TestPostUpdateReservation(t *testing.T) {
+	for _, urt := range updateReservationTests {
+		postedData := url.Values{}
+		postedData.Add("first-name", urt.userFirstName)
+		postedData.Add("last-name", urt.userLastName)
+		postedData.Add("email", urt.userEmail)
+		postedData.Add("phone", urt.userPhone)
+		postedData.Add("year", urt.year)
+		postedData.Add("month", urt.month)
+
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/admin/reservations/%s/%d", urt.src, urt.resID), strings.NewReader(postedData.Encode()))
+		ctx := getCTX(req)
+		req = req.WithContext(ctx)
+
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		rr := httptest.NewRecorder()
+
+		handler := http.HandlerFunc(Repo.AdminPostUpdateReservation)
+		handler.ServeHTTP(rr, req)
+
+		if rr.Code != urt.expectedStatusCode {
+			t.Errorf("failed %s: expected code %d, but got %d", urt.name, urt.expectedStatusCode, rr.Code)
+		}
+
+		if urt.expectedLocation != "" {
+			actualLocation, _ := rr.Result().Location()
+			if actualLocation.String() != urt.expectedLocation {
+				t.Errorf("failed %s: expected location %s but got location %s", urt.name, urt.expectedLocation, actualLocation)
+			}
+		}
+
+		if urt.expectedHTML != "" {
+			html := rr.Body.String()
+			if !strings.Contains(html, urt.expectedHTML) {
+				t.Errorf("failed %s: expected html %s but got %s", urt.name, urt.expectedHTML, html)
+			}
+		}
+	}
+}
+
+func TestAdminProcessReservation(t *testing.T) {
+	for _, prt := range procesDeleteTests {
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/admin/reservations/%s/%s/process?y=%s&m=%s", prt.src, prt.resID, prt.year, prt.month), nil)
+		ctx := getCTX(req)
+		req = req.WithContext(ctx)
+
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		rr := httptest.NewRecorder()
+
+		handler := http.HandlerFunc(Repo.AdminProcessReservation)
+		handler.ServeHTTP(rr, req)
+
+		if rr.Code != prt.expectedStatusCode {
+			t.Errorf("failed %s: expected code %d, but got %d", prt.name, prt.expectedStatusCode, rr.Code)
+		}
+
+		if prt.expectedLocation != "" {
+			actualLocation, _ := rr.Result().Location()
+			if actualLocation.String() != prt.expectedLocation {
+				t.Errorf("failed %s: expected location %s but got location %s", prt.name, prt.expectedLocation, actualLocation)
+			}
+		}
+
+		if prt.expectedHTML != "" {
+			html := rr.Body.String()
+			if !strings.Contains(html, prt.expectedHTML) {
+				t.Errorf("failed %s: expected html %s but got %s", prt.name, prt.expectedHTML, html)
+			}
+		}
+	}
+}
+
+func TestAdminDeleteReservation(t *testing.T) {
+	for _, prt := range procesDeleteTests {
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/admin/reservations/%s/%s/delete?y=%s&m=%s", prt.src, prt.resID, prt.year, prt.month), nil)
+		ctx := getCTX(req)
+		req = req.WithContext(ctx)
+
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		rr := httptest.NewRecorder()
+
+		handler := http.HandlerFunc(Repo.AdminDeleteReservation)
+		handler.ServeHTTP(rr, req)
+
+		if rr.Code != prt.expectedStatusCode {
+			t.Errorf("failed %s: expected code %d, but got %d", prt.name, prt.expectedStatusCode, rr.Code)
+		}
+
+		if prt.expectedLocation != "" {
+			actualLocation, _ := rr.Result().Location()
+			if actualLocation.String() != prt.expectedLocation {
+				t.Errorf("failed %s: expected location %s but got location %s", prt.name, prt.expectedLocation, actualLocation)
+			}
+		}
+
+		if prt.expectedHTML != "" {
+			html := rr.Body.String()
+			if !strings.Contains(html, prt.expectedHTML) {
+				t.Errorf("failed %s: expected html %s but got %s", prt.name, prt.expectedHTML, html)
+			}
+		}
+	}
+}
+
+func TestPostReservationCalendar(t *testing.T) {
+	for _, e := range adminPostReservationCalendarTests {
+		var req *http.Request
+		if e.postedData != nil {
+			req, _ = http.NewRequest("POST", "/admin/reservations-calendar", strings.NewReader(e.postedData.Encode()))
+		} else {
+			req, _ = http.NewRequest("POST", "/admin/reservations-calendar", nil)
+		}
+		ctx := getCTX(req)
+		req = req.WithContext(ctx)
+
+		now := time.Now()
+		bm := make(map[string]int)
+		rm := make(map[string]int)
+
+		currentYear, currentMonth, _ := now.Date()
+		currentLocation := now.Location()
+
+		firstOfMonth := time.Date(currentYear, currentMonth, 1, 0, 0, 0, 0, currentLocation)
+		lastOfMonth := firstOfMonth.AddDate(0, 1, -1)
+
+		for d := firstOfMonth; d.After(lastOfMonth) == false; d = d.AddDate(0, 0, 1) {
+			rm[d.Format("2006-01-2")] = 0
+			bm[d.Format("2006-01-2")] = 0
+		}
+
+		if e.blocks > 0 {
+			bm[firstOfMonth.Format("2006-01-2")] = e.blocks
+		}
+
+		if e.reservations > 0 {
+			rm[lastOfMonth.Format("2006-01-2")] = e.reservations
+		}
+
+		session.Put(ctx, "block_map_1", bm)
+		session.Put(ctx, "reservation_map_1", rm)
+
+		// set the header
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		rr := httptest.NewRecorder()
+
+		// call the handler
+		handler := http.HandlerFunc(Repo.AdminPostReservationsCalendar)
+		handler.ServeHTTP(rr, req)
+
+		if rr.Code != e.expectedResponseCode {
+			t.Errorf("failed %s: expected code %d, but got %d", e.name, e.expectedResponseCode, rr.Code)
+		}
+
+	}
 }
 
 func getCTX(req *http.Request) context.Context {

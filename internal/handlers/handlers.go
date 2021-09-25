@@ -819,24 +819,22 @@ func (m *Repository) AdminPostReservationsCalendar(w http.ResponseWriter, r *htt
 	if err != nil {
 		m.App.ErrorLog.Println(err)
 		m.App.Session.Put(r.Context(), "error", "Error retrieving form information")
-		http.Redirect(w, r, "/admin/reservations-calendar", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/admin/reservations-calendar", http.StatusSeeOther)
 		return
 	}
-
-	fmt.Println(r.PostForm)
 
 	year, err := strconv.Atoi(r.Form.Get("y"))
 	if err != nil {
 		m.App.ErrorLog.Println(err)
 		m.App.Session.Put(r.Context(), "error", "Error retrieving form information")
-		http.Redirect(w, r, "/admin/reservations-calendar", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/admin/reservations-calendar", http.StatusSeeOther)
 		return
 	}
 	month, err := strconv.Atoi(r.Form.Get("m"))
 	if err != nil {
 		m.App.ErrorLog.Println(err)
 		m.App.Session.Put(r.Context(), "error", "Error retrieving form information")
-		http.Redirect(w, r, "/admin/reservations-calendar", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/admin/reservations-calendar", http.StatusSeeOther)
 		return
 	}
 
@@ -845,7 +843,7 @@ func (m *Repository) AdminPostReservationsCalendar(w http.ResponseWriter, r *htt
 	if err != nil {
 		m.App.ErrorLog.Println(err)
 		m.App.Session.Put(r.Context(), "error", "Error retrieving form information")
-		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%d&m=%d", year, month), http.StatusTemporaryRedirect)
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%d&m=%d", year, month), http.StatusSeeOther)
 		return
 	}
 
@@ -862,7 +860,7 @@ func (m *Repository) AdminPostReservationsCalendar(w http.ResponseWriter, r *htt
 						if err != nil {
 							m.App.ErrorLog.Println(err)
 							m.App.Session.Put(r.Context(), "error", "Error deleting block")
-							http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%d&m=%d", year, month), http.StatusTemporaryRedirect)
+							http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%d&m=%d", year, month), http.StatusSeeOther)
 							return
 						}
 					}
