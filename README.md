@@ -1,8 +1,8 @@
-# Reservations System
+# Reservation System
 
 [Live demo here](https://reservation-system.clintonforster.com)
 
-A hotel reservations system.
+A hotel reservation system.
 
  - Built using [Go](https://golang.org/).
  - Uses [chi router](github.com/go-chi/chi/v5)
