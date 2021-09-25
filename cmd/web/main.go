@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/gob"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -51,8 +52,11 @@ func main() {
 }
 
 func run() (*driver.DB, error) {
-	//load env variables
+	//load env variables and flags
+
 	godotenv.Load()
+	inProduction := flag.Bool("production", false, "Application is in production")
+	flag.Parse()
 
 	// Add to session
 	gob.Register(models.Reservation{})
@@ -64,7 +68,7 @@ func run() (*driver.DB, error) {
 	//create mail channel
 	mailChan := make(chan models.MailData)
 	app.MailChan = mailChan
-	app.InProduction = false
+	app.InProduction = *inProduction
 
 	// create loggers
 	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
@@ -81,7 +85,16 @@ func run() (*driver.DB, error) {
 
 	// connect to database
 	log.Println("Connecting to database")
-	db, err := driver.ConnectSQl(os.Getenv("DATABASE_URL"))
+	connectionString := fmt.Sprintf(
+		"host=%s port=%s dbname=%s user=%s password=%s sslmode=%s",
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_NAME"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_SSL"),
+	)
+	db, err := driver.ConnectSQl(connectionString)
 	if err != nil {
 		log.Fatal("cannot connect to database")
 		return nil, err
@@ -95,7 +108,7 @@ func run() (*driver.DB, error) {
 	}
 
 	app.TemplateCache = templateCache
-	app.UseCache = false
+	app.UseCache = app.InProduction
 
 	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
