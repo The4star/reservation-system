@@ -1,0 +1,47 @@
+{{template "base" .}}
+{{define "content"}}
+<div class="container">
+  <div class="row my-5">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+    <h1>Login</h1>
+    <form action="/user/login" method="POST" class="reservation-form needs-validation" novalidate>
+        <div class="form-group mt-3 mb-3">
+          <input type="hidden" name="csrf_token" value={{.CSRFToken}}>
+          <label for="email">Email</label>
+          {{ with .Form.Errors.Get "email" }}
+            <label class="text-danger">{{.}}</label>
+          {{end}}
+          <input 
+            class="form-control {{ with .Form.Errors.Get "email" }} is-invalid {{end}}" 
+            type="email"
+            name="email" 
+            id="email" 
+            required 
+            autocomplete="off"
+            value=""
+          >
+          <div class="form-group mt-3 mb-3">
+            <label for="password">Password</label>
+            {{ with .Form.Errors.Get "password" }}
+              <label class="text-danger">{{.}}</label>
+            {{end}}
+            <input 
+              class="form-control {{ with .Form.Errors.Get "password" }} is-invalid {{end}}" 
+              type="password"
+              name="password" 
+              id="password" 
+              required 
+              autocomplete="off"
+              value=""
+            >
+          </div>
+        </div>
+        <hr>
+        <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+      </div>
+      <div class="col-md-3"></div>
+  </div>
+</div>
+{{end}}

@@ -1,11 +1,11 @@
 {{template "base" .}}
 {{define "content"}}
 <div class="container">
-  <div class="row">
+  <div class="row my-5">
     <div class="col-md-3"></div>
     <div class="col-md-6">
       {{$reservation := index .Data "reservation" }}
-      <h1 class="mt-5">Make a Reservation</h1>
+      <h1>Make a Reservation</h1>
       <p><strong>Reservation Details</strong></p>
       <p>Room: {{$reservation.Room.RoomName}}</p>
       <p>Arrival: {{index .StringMap "start-date" }}</p>

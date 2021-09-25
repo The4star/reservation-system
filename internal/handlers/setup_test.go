@@ -22,7 +22,11 @@ import (
 )
 
 var app config.AppConfig
-var functions = template.FuncMap{}
+var functions = template.FuncMap{
+	"niceDate":   helpers.NiceDate,
+	"formatDate": helpers.FormatDate,
+	"iterate":    helpers.Iterate,
+}
 var session *scs.SessionManager
 var pathToTemplates string = "../../templates"
 var infoLog *log.Logger
@@ -30,6 +34,10 @@ var errorLog *log.Logger
 
 func TestMain(m *testing.M) {
 	gob.Register(models.Reservation{})
+	gob.Register(models.User{})
+	gob.Register(models.Room{})
+	gob.Register(models.Restriction{})
+	gob.Register(map[string]int{})
 
 	app.InProduction = false
 
@@ -53,6 +61,7 @@ func TestMain(m *testing.M) {
 
 	templateCache, err := CreateTestTemplateCache()
 	if err != nil {
+		log.Println(err)
 		log.Fatal("cannot create template cache.")
 	}
 
@@ -71,9 +80,6 @@ func getRoutes() http.Handler {
 	router.Use(middleware.Recoverer)
 	router.Use(SessionLoad)
 
-	noSurfGroup := router.Group(nil)
-	// noSurfGroup.Use(NoSurf)
-
 	//routes
 	router.Get("/", Repo.Home)
 	router.Get("/about", Repo.About)
@@ -81,12 +87,29 @@ func getRoutes() http.Handler {
 	router.Get("/rooms/standard-suite", Repo.StandardSuite)
 	router.Get("/rooms/deluxe-suite", Repo.DeluxeSuite)
 
+	//booking
 	router.Get("/book", Repo.Book)
 	router.Post("/book", Repo.PostBook)
 	router.Get("/reservation-summary", Repo.ReservationSummary)
 
-	noSurfGroup.Get("/availability", Repo.Availability)
-	noSurfGroup.Post("/availability", Repo.PostAvailability)
+	//user
+	router.Get("/user/login", Repo.ShowLogin)
+	router.Post("/user/login", Repo.PostLogin)
+	router.Get("/user/logout", Repo.Logout)
+
+	//protected
+	router.Get("/admin/dashboard", Repo.AdminDashboard)
+	router.Get("/admin/reservations-new", Repo.AdminNewReservations)
+	router.Get("/admin/reservations-all", Repo.AdminAllReservations)
+	router.Get("/admin/reservations-calendar", Repo.AdminReservationsCalendar)
+	router.Post("/admin/reservations-calendar", Repo.AdminPostReservationsCalendar)
+	router.Get("/admin/reservations/{src}/{id}/show", Repo.AdminShowReservation)
+	router.Post("/admin/reservations/{src}/{id}", Repo.AdminPostUpdateReservation)
+	router.Get("/admin/reservations/{src}/{id}/process", Repo.AdminProcessReservation)
+	router.Get("/admin/reservations/{src}/{id}/delete", Repo.AdminDeleteReservation)
+
+	router.Get("/availability", Repo.Availability)
+	router.Post("/availability", Repo.PostAvailability)
 	router.Post("/room-availability", Repo.PostRoomAvailability)
 
 	fileServer := http.FileServer(http.Dir("./static/"))
@@ -97,8 +120,7 @@ func getRoutes() http.Handler {
 func listenForMail() {
 	go func() {
 		for {
-			_ = <-app.MailChan
-
+			<-app.MailChan
 		}
 	}()
 }
@@ -142,13 +164,13 @@ func CreateTestTemplateCache() (map[string]*template.Template, error) {
 		if err != nil {
 			return myCache, err
 		}
-		matches, err := filepath.Glob(fmt.Sprintf("%s/*.layout.tmpl", pathToTemplates))
+		matches, err := filepath.Glob(fmt.Sprintf("%s/layouts/*.layout.tmpl", pathToTemplates))
 		if err != nil {
 			return myCache, err
 		}
 
 		if len(matches) > 0 {
-			ts, err = ts.ParseGlob(fmt.Sprintf("%s/*.layout.tmpl", pathToTemplates))
+			ts, err = ts.ParseGlob(fmt.Sprintf("%s/layouts/*.layout.tmpl", pathToTemplates))
 			if err != nil {
 				return myCache, err
 			}

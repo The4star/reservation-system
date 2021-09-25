@@ -1,0 +1,128 @@
+{{template "admin" .}}
+
+{{define "page-title"}}
+    Edit Reservation
+{{end}}
+
+{{define "content"}}
+  {{$res := index .Data "reservation"}}
+  {{$src := index .StringMap "src"}}
+    <div class="col-md-12">
+      <p>
+        <strong>Reservation ID:</strong>  {{$res.ID}}
+      </p>
+      <p>
+        <strong>Arrival:</strong>  {{niceDate $res.StartDate}}
+      </p>
+      <p>
+        <strong>Departure:</strong>  {{niceDate $res.EndDate}}
+      </p>
+      <p>
+        <strong>Room:</strong>  {{$res.Room.RoomName}}
+      </p>
+      <form action="/admin/reservations/{{$src}}/{{$res.ID}}" method="POST" class="reservation-form needs-validation" novalidate>
+        <div class="form-group mt-3 mb-3">
+          <input type="hidden" name="csrf_token" value={{.CSRFToken}}>
+          <input type="hidden" name="month" value={{index .StringMap "month"}}>
+          <input type="hidden" name="year" value={{index .StringMap "year"}} >
+          <label for="first-name">First Name:</label>
+          {{ with .Form.Errors.Get "first-name" }}
+            <label class="text-danger">{{.}}</label>
+          {{end}}
+          <input 
+            class="form-control {{ with .Form.Errors.Get "first-name" }} is-invalid {{end}}" 
+            type="text"
+            name="first-name" 
+            id="first-name" 
+            required 
+            autocomplete="off"
+            value="{{$res.FirstName}}"
+          >
+        </div>
+        <div class="form-group mb-3">
+          <label for="last-name">Last Name:</label>
+          {{ with .Form.Errors.Get "last-name" }}
+            <label class="text-danger">{{.}}</label>
+          {{end}}
+          <input 
+            class="form-control {{ with .Form.Errors.Get "last-name" }} is-invalid {{end}}" 
+            type="text" 
+            name="last-name" 
+            id="last-name" 
+            required autocomplete="off"
+            value="{{$res.LastName}}"
+          >
+        </div>
+        <div class="form-group mb-3">
+          <label for="email">Email:</label>
+          {{ with .Form.Errors.Get "email" }}
+            <label class="text-danger">{{.}}</label>
+          {{end}}
+          <input 
+            class="form-control {{ with .Form.Errors.Get "email" }} is-invalid {{end}}" 
+            type="email" 
+            name="email" 
+            id="email" 
+            required 
+            autocomplete="off"
+            value="{{$res.Email}}"
+          >
+        </div>
+        <div class="form-group mb-3">
+          <label for="address">Phone Number:</label>
+          {{ with .Form.Errors.Get "phone" }}
+            <label class="text-danger">{{.}}</label>
+          {{end}}
+          <input 
+            class="form-control {{ with .Form.Errors.Get "phone" }} is-invalid {{end}}" 
+            type="text" 
+            name="phone" 
+            id="phone" 
+            required autocomplete="off"
+            value="{{$res.Phone}}"
+          >
+        </div>
+        <div class="float-left">
+          <button type="submit" class="btn btn-primary">Save</button>
+          {{if eq $src "cal"}}
+            <a href="#" onclick="window.history.go(-1)" class="btn btn-warning">Cancel</a>
+          {{else}}
+            <a href="/admin/reservations-{{$src}}" class="btn btn-warning">Cancel</a>
+          {{end}}
+          {{if eq $res.Processed false}}
+          <button 
+            id="process"
+            class="btn btn-primary" 
+            role="button" 
+            type="button" 
+            data-id="{{$res.ID}}"
+            data-src="{{$src}}" 
+            data-month="{{index .StringMap "month"}}"
+            data-year="{{index .StringMap "year"}}"
+          >
+            Mark as processed
+          </button>
+          {{end}}
+        </div>
+        <div class="float-right">
+          <button 
+            id="delete"
+            class="btn btn-danger" 
+            role="button" 
+            type="button" 
+            data-src="{{$src}}" 
+            data-id="{{$res.ID}}"
+            data-month="{{index .StringMap "month"}}"
+            data-year="{{index .StringMap "year"}}"
+          >
+            Delete
+          </button>
+        </div>
+        <div class="clearfix"></div>
+      </form>
+    </div>
+{{end}}
+
+{{define "js"}}
+<script src="/static/scripts/admin/reservation-show.js" type="module"></script>
+{{end}}

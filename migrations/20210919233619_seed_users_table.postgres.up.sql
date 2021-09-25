@@ -1,0 +1,2 @@
+insert into users(first_name, last_name, email, password, access_level, created_at, updated_at)
+values('Admin', 'User', 'admin@example.com', '$2a$12$sLPqpzSodara/YVIshJHpeoyCYT75HimdZJxoKLp5wdW7XQLmycJy', 3, now(), now());

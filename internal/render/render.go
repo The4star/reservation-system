@@ -11,10 +11,15 @@ import (
 
 	"github.com/justinas/nosurf"
 	"github.com/the4star/reservation-system/internal/config"
+	"github.com/the4star/reservation-system/internal/helpers"
 	"github.com/the4star/reservation-system/internal/models"
 )
 
-var functions = template.FuncMap{}
+var functions = template.FuncMap{
+	"niceDate":   helpers.NiceDate,
+	"formatDate": helpers.FormatDate,
+	"iterate":    helpers.Iterate,
+}
 var app *config.AppConfig
 var pathToTemplates string = "./templates"
 
@@ -27,6 +32,9 @@ func AddDefaultData(data *models.TemplateData, r *http.Request) *models.Template
 	data.Error = app.Session.PopString(r.Context(), "error")
 	data.Warning = app.Session.PopString(r.Context(), "warning")
 	data.CSRFToken = nosurf.Token((r))
+	if app.Session.Exists(r.Context(), "user_id") {
+		data.IsAuthenticated = true
+	}
 	return data
 }
 
@@ -85,13 +93,13 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 		if err != nil {
 			return myCache, err
 		}
-		matches, err := filepath.Glob(fmt.Sprintf("%s/*.layout.tmpl", pathToTemplates))
+		matches, err := filepath.Glob(fmt.Sprintf("%s/layouts/*.layout.tmpl", pathToTemplates))
 		if err != nil {
 			return myCache, err
 		}
 
 		if len(matches) > 0 {
-			ts, err = ts.ParseGlob(fmt.Sprintf("%s/*.layout.tmpl", pathToTemplates))
+			ts, err = ts.ParseGlob(fmt.Sprintf("%s/layouts/*.layout.tmpl", pathToTemplates))
 			if err != nil {
 				return myCache, err
 			}
