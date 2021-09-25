@@ -11,13 +11,14 @@ A hotel reservations system.
 ## database setup
 
 * create a database in postgresql e.g `create database reservation_system`
-* create a `database.yaml` file and populate the *database* *user* and *password*
 * [install soda for migrations](https://gobuffalo.io/en/docs/db/toolbox/)
-* *note*: if soda commands don't work you will need to add the following command to your .bashprofile(linux) or .zhrc file (mac).
+* *note*: if soda commands don't work (check by running `soda -v`) you will need to add the following command to your .bashprofile(linux) or .zhrc file (mac).
 
 ```bash
 export PATH="$HOME/go/bin:$PATH"
 ```
+
+* create a `database.yaml` file and populate the *database* *user* and *password*
 
 ```yaml
 development:
@@ -33,6 +34,18 @@ test:
 
 production:
   url: {{envOr "DATABASE_URL" "postgres://postgres:postgres@127.0.0.1:5432/myapp_production"}}
+```
+
+* create the following env file and populate the values.
+
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=
+DB_USER=
+DB_PASSWORD=
+DB_SSL=false
+
 ```
 * run `soda migrate`
 
